@@ -1,6 +1,6 @@
 {
   "name": "@hifipass/passport-core",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Pure provenance engine — signed, hash-linked, append-only attestation chains. No UI, no framework, no I/O.",
   "license": "MIT",
   "type": "module",
@@ -19,7 +19,8 @@
     "./schemas/*": {
       "types": "./dist/schemas/*.d.ts",
       "import": "./dist/schemas/*.js"
-    }
+    },
+    "./package.json": "./package.json"
   },
   "files": [
     "dist",

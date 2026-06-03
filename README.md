@@ -8,7 +8,7 @@ Tamper-evidence **without a blockchain**: each record carries the hash of the on
 
 ```bash
 # private git dependency, pinned to a release tag:
-npm install github:piotr-dziubecki/hifipass#v0.1.0
+npm install github:piotr-dziubecki/hifipass#v0.1.1
 # installs as @hifipass/passport-core; builds dist on install (prepare);
 # crypto deps (@noble/curves, @noble/hashes, zod) come with it
 ```
