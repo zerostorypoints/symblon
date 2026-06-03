@@ -79,10 +79,18 @@ Plus `PublicKeyResolver` `(keyId) => publicKey | null`, injected into verificati
 | `verifyAttestation(a, resolve)` | verify one record's hash + signature |
 | `verifyChain(atts, resolve)` | verify a whole chain; track the controller; switch it at `custody_change`; return first broken link |
 | `computeMerkleRoot(hashes)` | Merkle root over payload hashes (anchor-ready, dormant) |
+| `commitField(value, salt)` / `verifyOpening(commitment, value, salt)` | commit a private field to a salted hash; verify an opening |
+| `currentController(atts)` / `currentCommitments(atts)` | read a verified chain's current controller key / effective commitment map |
+| `buildPresentation(input, signer, created)` | build + sign a short-lived proof-of-ownership + selective disclosure |
+| `verifyPresentation(p, chain, resolve, now)` | verify a presentation: fresh, chain valid, signer is current controller, openings match commitments |
 | `canonicalize(value)` / `sha256Hex(s)` | deterministic JSON + hashing primitives |
 | `AttestationSchema` | Zod schema mirroring the `Attestation` type |
 
 **Verification failure reasons** (`verifyChain`): `prev-hash-mismatch`, `wrong-signer`, `payload-hash-mismatch`, `bad-signature`, `unverifiable`, `malformed-custody-claim`, `controller-key-mismatch`.
+
+### Selective disclosure
+
+Private fields are stored as **salted commitments** on the attestation (`commitments: { field: hash }`) — covered by `payloadHash`, so signed and tamper-evident. The raw `(value, salt)` openings live in custody. An owner builds a short-lived **Presentation** disclosing a chosen subset; any verifier checks it is fresh, that the chain verifies, that the presenter is the chain's *current* controller, and that each opening matches its committed hash — with zero trust in the operator.
 
 ## Scripts
 

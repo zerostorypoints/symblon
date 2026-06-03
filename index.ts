@@ -18,3 +18,14 @@ export { signAttestation } from "./sign-attestation.js";
 export { verifyAttestation, type VerifyResult, type VerifyFailureReason } from "./verify-attestation.js";
 export { verifyChain, type ChainVerification, type ChainFailureReason } from "./verify-chain.js";
 export { computeMerkleRoot } from "./merkle.js";
+export { commitField, verifyOpening } from "./commitments.js";
+export { currentController, currentCommitments } from "./chain-state.js";
+export {
+  buildPresentation,
+  verifyPresentation,
+  type DisclosedField,
+  type Presentation,
+  type PresentationInput,
+  type PresentationVerification,
+  type PresentationFailureReason,
+} from "./presentation.js";
