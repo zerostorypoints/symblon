@@ -3,6 +3,7 @@ import { bytesToHex } from "@noble/hashes/utils";
 import { verifyAttestation } from "./verify-attestation.js";
 import { CUSTODY_CHANGE, type Attestation } from "./types/attestation.js";
 import type { PublicKeyResolver } from "./types/seams.js";
+import { parseNewController } from "./custody.js";
 
 export type ChainFailureReason =
   | "payload-hash-mismatch"
@@ -55,30 +56,17 @@ export async function verifyChain(
     // 5. A custody_change (signed by the outgoing controller, just verified)
     //    hands control to the new key for all subsequent links.
     if (a.type === CUSTODY_CHANGE) {
-      // 5a. Guard: validate claim shape at runtime before trusting any field.
-      const HEX64 = /^[0-9a-f]{64}$/;
-      const c = a.claim;
-      const nc =
-        c !== null &&
-        typeof c === "object" &&
-        "newController" in c &&
-        (c as Record<string, unknown>)["newController"] !== null &&
-        typeof (c as Record<string, unknown>)["newController"] === "object"
-          ? ((c as Record<string, unknown>)["newController"] as Record<string, unknown>)
-          : null;
-      const newKeyId = nc && typeof nc["keyId"] === "string" ? nc["keyId"] : null;
-      const newPublicKey = nc && typeof nc["publicKey"] === "string" ? nc["publicKey"] : null;
-      if (!newKeyId || !newKeyId.length || !newPublicKey || !HEX64.test(newPublicKey)) {
+      // 5a. Validate the claim shape before trusting any field.
+      const nc = parseNewController(a.claim);
+      if (!nc) {
         return { ok: false, brokenIndex: i, reason: "malformed-custody-claim" };
       }
-
-      // 5b. Bind: if the resolver knows the new key, it must match what the signed claim authorized.
-      const newPub = await resolvePublicKey(newKeyId);
-      if (newPub !== null && bytesToHex(newPub) !== newPublicKey) {
+      // 5b. Bind: if the resolver knows the new key, it must match the signed claim.
+      const newPub = await resolvePublicKey(nc.keyId);
+      if (newPub !== null && bytesToHex(newPub) !== nc.publicKey) {
         return { ok: false, brokenIndex: i, reason: "controller-key-mismatch" };
       }
-
-      activeKeyId = newKeyId;
+      activeKeyId = nc.keyId;
     }
   }
 
