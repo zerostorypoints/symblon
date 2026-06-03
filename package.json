@@ -4,24 +4,36 @@
   "description": "Pure provenance engine — signed, hash-linked, append-only attestation chains. No UI, no framework, no I/O.",
   "license": "MIT",
   "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    ".": "./index.ts",
-    "./types/*": "./types/*.ts",
-    "./schemas/*": "./schemas/*.ts"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./types/*": {
+      "types": "./dist/types/*.d.ts",
+      "import": "./dist/types/*.js"
+    },
+    "./schemas/*": {
+      "types": "./dist/schemas/*.d.ts",
+      "import": "./dist/schemas/*.js"
+    }
   },
   "files": [
-    "index.ts",
-    "types",
-    "schemas",
-    "*.ts",
+    "dist",
     "README.md",
     "LICENSE"
   ],
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
-    "build": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
     "lint": "tsc --noEmit",
+    "build": "tsc -p tsconfig.build.json",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run clean && npm run build",
     "example": "tsx examples/basic-passport.ts"
   },
   "keywords": [

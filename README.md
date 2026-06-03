@@ -11,7 +11,7 @@ npm install @hifipass/passport-core
 # crypto deps come with it: @noble/curves, @noble/hashes, zod
 ```
 
-> Source-distributed TypeScript: the package entry points are `.ts`, so consume it from a TS toolchain that transpiles dependencies (a bundler, `transpilePackages` in Next.js, `tsx`, etc.). A compiled `dist` build for plain-JS consumers is a deferred packaging step.
+> Ships compiled ESM (`dist/*.js`) with type declarations (`dist/*.d.ts`) — consumable by any TypeScript or JavaScript project. Build it with `npm run build`; the published artifact is `dist/`, regenerated automatically on publish via `prepublishOnly`.
 
 ## Quickstart
 
@@ -86,7 +86,8 @@ Plus `PublicKeyResolver` `(keyId) => publicKey | null`, injected into verificati
 
 ```bash
 npm test            # vitest — the full engine suite
-npm run build       # tsc --noEmit (strict typecheck)
+npm run typecheck   # tsc --noEmit (strict typecheck)
+npm run build       # emit dist/ — compiled ESM + .d.ts
 npm run example     # run examples/basic-passport.ts
 ```
 
@@ -99,7 +100,7 @@ Pure functions only, no I/O, no `Date.now()`/random inside (times and ids are pa
 
 ## Status & deferred
 
-Implemented: the full attestation model, signing/verification, controller-tracking chain verification with custody handover, and an anchor-ready Merkle root. Deferred by design: W3C Verifiable Credentials / GS1 EPCIS export adapters, public-ledger anchoring, a Hypercore/Autobase substrate for the sovereign tier, and a compiled `dist` build for plain-JS consumers.
+Implemented: the full attestation model, signing/verification, controller-tracking chain verification with custody handover, an anchor-ready Merkle root, and a compiled `dist` build (ESM + `.d.ts`). Deferred by design: W3C Verifiable Credentials / GS1 EPCIS export adapters, public-ledger anchoring, and a Hypercore/Autobase substrate for the sovereign tier.
 
 ## License
 

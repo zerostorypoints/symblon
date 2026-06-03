@@ -7,7 +7,7 @@ _Last updated: 2026-06-03_
 `@hifipass/passport-core` **v0.1.0** — the pure provenance engine.
 
 - Complete and tested: **36 tests**, strict TypeScript clean (`npm run build`), runnable example (`npm run example`).
-- Source-distributed TypeScript — entry points are raw `.ts`; **no compiled `dist` yet**.
+- Ships a compiled `dist` build (ESM `.js` + `.d.ts`) via `npm run build`; `exports`/`main`/`types` point at `dist/`. **Not yet published** to a registry.
 - **Extracted from the hifisync monorepo on 2026-06-03; the monorepo copy was removed.** This repo is now the single source of truth for the engine.
 - **Not published** to any registry and **not wired** into any consumer (deliberate, this session).
 
@@ -29,7 +29,7 @@ The full design and the detailed implementation plans live in the **hifisync** r
 ### 1. Distribution — unblocks every consumer
 Other repos consume this engine, so decide and ship the distribution path:
 
-- [ ] **Add a compiled `dist` build** (`tsc` emit; point `exports` at `dist/*.js` + `.d.ts`) so consumers that don't transpile node_modules work. Today the entries are raw `.ts`.
+- [x] **Compiled `dist` build** — `npm run build` emits ESM `dist/*.js` + `.d.ts`; `exports`/`main`/`types` point at `dist/`; `prepublishOnly` rebuilds. _(Done 2026-06-03.)_
 - [ ] **Publish `@hifipass/passport-core` privately** — GitHub Packages (same account) or a private npm scope — **or** consume via git URL. Pick one; document the install command.
 - [ ] **Add CI** — a GitHub Action running `npm test` + `npm run build` on push/PR.
 
