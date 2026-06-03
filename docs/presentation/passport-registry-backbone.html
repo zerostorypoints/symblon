@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HiFiPass — Passport Registry Backbone</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#0a0b0d;
+    --bg-2:#0e1013;
+    --panel:#141619;
+    --panel-2:#181b1f;
+    --hair:rgba(255,255,255,.08);
+    --hair-2:rgba(255,255,255,.14);
+    --ink:#ece7dd;
+    --ink-dim:#a09b90;
+    --ink-faint:#6c6860;
+    /* signal system */
+    --warm:#eda53d;        /* custody · human · ownership · escrow · pro */
+    --warm-soft:rgba(237,165,61,.14);
+    --warm-line:rgba(237,165,61,.34);
+    --cool:#54d6c6;        /* crypto · registry · commitment · verify */
+    --cool-soft:rgba(84,214,198,.12);
+    --cool-line:rgba(84,214,198,.32);
+    --red:#e0664f;
+    --green:#7fcf8e;
+    --maxw:1180px;
+    --ease:cubic-bezier(.22,.61,.36,1);
+    font-synthesis:none;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Archivo",ui-sans-serif,system-ui,sans-serif;
+    font-size:16px;line-height:1.6;letter-spacing:.005em;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  /* atmospheric backdrop: warm tube glow + cool signal + grain */
+  body::before{
+    content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;
+    background:
+      radial-gradient(820px 520px at 84% -8%, rgba(237,165,61,.10), transparent 60%),
+      radial-gradient(700px 600px at 8% 108%, rgba(84,214,198,.07), transparent 60%),
+      linear-gradient(180deg,var(--bg),var(--bg-2));
+  }
+  body::after{
+    content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.035;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  ::selection{background:var(--warm);color:#1a1206}
+
+  /* ---------- chrome ---------- */
+  .topbar{
+    position:fixed;top:0;left:0;right:0;z-index:40;
+    display:flex;justify-content:space-between;align-items:center;
+    padding:18px 30px;
+    background:linear-gradient(180deg,rgba(10,11,13,.82),rgba(10,11,13,0));
+    backdrop-filter:blur(4px);
+  }
+  .wordmark{font-family:"JetBrains Mono",monospace;font-weight:600;font-size:13px;letter-spacing:.32em;color:var(--ink)}
+  .wordmark b{color:var(--warm)}
+  .topmeta{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.18em;color:var(--ink-faint);text-transform:uppercase}
+
+  nav.dots{
+    position:fixed;left:26px;top:50%;transform:translateY(-50%);z-index:40;
+    display:flex;flex-direction:column;gap:14px;
+  }
+  nav.dots a{
+    display:flex;align-items:center;gap:11px;text-decoration:none;
+    font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:.08em;
+    color:var(--ink-faint);transition:color .3s var(--ease);
+  }
+  nav.dots a .pip{width:7px;height:7px;border-radius:50%;border:1px solid var(--hair-2);transition:all .3s var(--ease)}
+  nav.dots a .lbl{opacity:0;transform:translateX(-4px);transition:all .3s var(--ease);white-space:nowrap}
+  nav.dots a:hover .lbl,nav.dots a.active .lbl{opacity:1;transform:translateX(0)}
+  nav.dots a:hover{color:var(--ink-dim)}
+  nav.dots a.active{color:var(--ink)}
+  nav.dots a.active .pip{background:var(--warm);border-color:var(--warm);box-shadow:0 0 10px var(--warm-line)}
+
+  /* ---------- layout ---------- */
+  section{
+    position:relative;
+    max-width:var(--maxw);margin:0 auto;
+    padding:108px 40px 64px;
+  }
+  section + section{border-top:1px solid var(--hair)}
+  .eyebrow{
+    font-family:"JetBrains Mono",monospace;font-size:11.5px;letter-spacing:.28em;
+    text-transform:uppercase;color:var(--ink-faint);
+    display:flex;align-items:center;gap:12px;margin-bottom:20px;
+  }
+  .eyebrow::before{content:"";width:26px;height:1px;background:var(--warm);box-shadow:0 0 8px var(--warm-line)}
+  .eyebrow .num{color:var(--warm)}
+  h2{
+    font-family:"Fraunces",serif;font-weight:500;font-size:clamp(30px,4.4vw,52px);
+    line-height:1.04;letter-spacing:-.01em;margin-bottom:18px;
+  }
+  h2 em{font-style:italic;color:var(--warm)}
+  h2 .cy{color:var(--cool);font-style:normal}
+  .lede{font-size:clamp(16px,1.5vw,19px);color:var(--ink-dim);max-width:64ch;line-height:1.55}
+  .lede b{color:var(--ink);font-weight:600}
+  .note{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--ink-faint);line-height:1.7;letter-spacing:.01em}
+  .mono{font-family:"JetBrains Mono",monospace}
+
+  /* ---------- HERO ---------- */
+  .hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding-top:80px}
+  .hero h1{
+    font-family:"Fraunces",serif;font-weight:500;
+    font-size:clamp(48px,8.6vw,116px);line-height:.92;letter-spacing:-.025em;
+    margin:8px 0 0;
+  }
+  .hero h1 .l2{display:block;color:var(--ink-dim)}
+  .hero h1 .l2 em{font-style:italic;color:var(--warm)}
+  .hero .kicker{
+    font-family:"JetBrains Mono",monospace;font-size:13px;letter-spacing:.3em;
+    text-transform:uppercase;color:var(--cool);margin-bottom:6px;
+  }
+  .hero .sub{margin-top:30px;max-width:60ch;font-size:19px;color:var(--ink-dim);line-height:1.55}
+  .hero .sub b{color:var(--ink);font-weight:600}
+  /* signal waveform */
+  .wave{margin:42px 0 38px;width:100%;max-width:760px;height:54px;overflow:visible}
+  .wave path{fill:none;stroke-linecap:round}
+  .wave .w1{stroke:var(--warm);stroke-width:2;filter:drop-shadow(0 0 6px var(--warm-line));
+    stroke-dasharray:1400;stroke-dashoffset:1400;animation:draw 2.2s var(--ease) .3s forwards}
+  .wave .w2{stroke:var(--cool);stroke-width:1.4;opacity:.7;
+    stroke-dasharray:1400;stroke-dashoffset:1400;animation:draw 2.2s var(--ease) .55s forwards}
+  @keyframes draw{to{stroke-dashoffset:0}}
+  .legend{display:flex;gap:28px;flex-wrap:wrap;margin-top:6px}
+  .legend .li{display:flex;align-items:center;gap:10px;font-family:"JetBrains Mono",monospace;font-size:12px;letter-spacing:.04em;color:var(--ink-dim)}
+  .legend .sw{width:13px;height:13px;border-radius:3px}
+  .legend .warm{background:var(--warm);box-shadow:0 0 12px var(--warm-line)}
+  .legend .cool{background:var(--cool);box-shadow:0 0 12px var(--cool-line)}
+  .hero .meta{margin-top:46px;display:flex;gap:34px;flex-wrap:wrap;font-family:"JetBrains Mono",monospace;font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint)}
+  .hero .meta span b{color:var(--ink-dim);font-weight:500}
+
+  /* ---------- rack (architecture) ---------- */
+  .rack{display:flex;flex-direction:column;gap:12px;margin-top:14px}
+  .unit{
+    position:relative;display:grid;grid-template-columns:128px 1fr auto;align-items:center;gap:26px;
+    padding:22px 26px 22px 30px;border:1px solid var(--hair);border-radius:11px;
+    background:linear-gradient(180deg,var(--panel-2),var(--panel));
+    overflow:hidden;transition:transform .4s var(--ease),border-color .4s var(--ease);
+  }
+  .unit:hover{transform:translateX(5px);border-color:var(--hair-2)}
+  .unit::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent,var(--ink-faint));box-shadow:0 0 16px var(--accent,transparent)}
+  .unit .screw{position:absolute;width:5px;height:5px;border-radius:50%;background:#26292e;box-shadow:inset 0 1px 1px rgba(255,255,255,.15)}
+  .unit .s1{left:13px;top:12px}.unit .s2{right:13px;top:12px}.unit .s3{left:13px;bottom:12px}.unit .s4{right:13px;bottom:12px}
+  .unit__tag{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.16em;color:var(--accent,var(--ink-faint));text-transform:uppercase}
+  .unit__name{font-family:"Fraunces",serif;font-size:23px;font-weight:500;line-height:1.1}
+  .unit__name small{display:block;font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.04em;color:var(--ink-faint);margin-top:3px;text-transform:none}
+  .unit__desc{color:var(--ink-dim);font-size:14.5px;max-width:46ch}
+  .unit__owns{font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:.04em;color:var(--ink-faint);text-align:right;max-width:22ch;line-height:1.6}
+  .u-core{--accent:var(--ink-dim)}
+  .u-pass{--accent:var(--cool)}
+  .u-agro{--accent:#9aa0a6}
+  .u-sync{--accent:var(--warm)}
+  .u-agro{opacity:.62;border-style:dashed}
+
+  /* ---------- tiers ---------- */
+  .tiers{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:10px}
+  @media(max-width:780px){.tiers{grid-template-columns:1fr}}
+  .tier{border:1px solid var(--hair);border-radius:12px;padding:26px;background:var(--panel)}
+  .tier.pub{border-color:var(--cool-line);background:linear-gradient(180deg,var(--cool-soft),transparent 70%)}
+  .tier.prv{border-color:var(--warm-line);background:linear-gradient(180deg,var(--warm-soft),transparent 70%)}
+  .tier h3{font-family:"Fraunces",serif;font-weight:500;font-size:22px;margin-bottom:4px}
+  .tier .tag{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:16px}
+  .tier.pub .tag{color:var(--cool)}.tier.prv .tag{color:var(--warm)}
+  .tier ul{list-style:none;display:flex;flex-direction:column;gap:9px}
+  .tier li{display:flex;gap:11px;align-items:flex-start;font-size:14.5px;color:var(--ink-dim)}
+  .tier li::before{content:"";flex:none;width:6px;height:6px;border-radius:1px;margin-top:8px}
+  .tier.pub li::before{background:var(--cool)}.tier.prv li::before{background:var(--warm)}
+  .tier li b{color:var(--ink);font-weight:600}
+  .tier .foot{margin-top:18px;padding-top:15px;border-top:1px solid var(--hair);font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--ink-faint);line-height:1.7}
+
+  /* ---------- generic flow ---------- */
+  .flow{display:flex;align-items:stretch;gap:0;flex-wrap:wrap;margin-top:12px}
+  .step{
+    flex:1;min-width:150px;position:relative;
+    border:1px solid var(--hair);border-radius:10px;padding:18px 18px;background:var(--panel);
+    display:flex;flex-direction:column;gap:7px;
+  }
+  .step + .step{margin-left:34px}
+  .step + .step::before{
+    content:"";position:absolute;left:-30px;top:50%;width:26px;height:1px;background:var(--hair-2);
+  }
+  .step + .step::after{
+    content:"";position:absolute;left:-9px;top:50%;transform:translateY(-50%) rotate(45deg);
+    width:6px;height:6px;border-top:1px solid var(--ink-faint);border-right:1px solid var(--ink-faint);
+  }
+  .step .k{font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--cool)}
+  .step .t{font-weight:600;font-size:15px;line-height:1.25}
+  .step .d{font-size:13px;color:var(--ink-dim);line-height:1.5}
+  .step.warm{border-color:var(--warm-line)}.step.warm .k{color:var(--warm)}
+  .step.cool{border-color:var(--cool-line)}
+  .step .mono.hash{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--cool);word-break:break-all}
+
+  /* branch flow (transfer) */
+  .propose{
+    border:1px solid var(--hair-2);border-radius:11px;padding:20px 24px;background:var(--panel-2);
+    display:flex;align-items:center;gap:18px;margin-bottom:8px;
+  }
+  .propose .badge{font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--warm);border:1px solid var(--warm-line);border-radius:999px;padding:4px 11px;white-space:nowrap}
+  .propose .txt b{color:var(--ink)}
+  .propose .txt{color:var(--ink-dim);font-size:14.5px}
+  .branch-stem{height:26px;width:1px;background:var(--hair-2);margin:0 auto}
+  .lanes{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:820px){.lanes{grid-template-columns:1fr}}
+  .lane{border:1px solid var(--hair);border-radius:12px;background:var(--panel);overflow:hidden;display:flex;flex-direction:column}
+  .lane__h{padding:14px 18px;border-bottom:1px solid var(--hair);display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .lane__h .name{font-family:"Fraunces",serif;font-size:18px;font-weight:500}
+  .lane__h .tg{font-family:"JetBrains Mono",monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:999px}
+  .lane.ok{--c:var(--green)} .lane.esc{--c:var(--warm)} .lane.claim{--c:var(--cool)}
+  .lane__h{border-bottom-color:color-mix(in srgb,var(--c) 30%,transparent)}
+  .lane .tg{color:var(--c);border:1px solid color-mix(in srgb,var(--c) 36%,transparent)}
+  .lane::before{content:"";height:3px;background:var(--c);box-shadow:0 0 14px color-mix(in srgb,var(--c) 60%,transparent)}
+  .lane__b{padding:16px 18px;display:flex;flex-direction:column;gap:13px;flex:1}
+  .lstep{display:flex;gap:12px}
+  .lstep .i{flex:none;width:20px;height:20px;border-radius:50%;border:1px solid var(--hair-2);font-family:"JetBrains Mono",monospace;font-size:10px;display:flex;align-items:center;justify-content:center;color:var(--ink-dim);margin-top:1px}
+  .lstep .lt{font-size:13.5px;color:var(--ink-dim);line-height:1.45}
+  .lstep .lt b{color:var(--ink);font-weight:600}
+  .pill{display:inline-block;font-family:"JetBrains Mono",monospace;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:5px;margin-left:4px}
+  .pill.pro{color:var(--warm);background:var(--warm-soft);border:1px solid var(--warm-line)}
+  .pill.free{color:var(--green);background:rgba(127,207,142,.1);border:1px solid rgba(127,207,142,.3)}
+
+  /* checks grid (disclosure) */
+  .twocol{display:grid;grid-template-columns:1.1fr .9fr;gap:24px;margin-top:12px}
+  @media(max-width:840px){.twocol{grid-template-columns:1fr}}
+  .checks{border:1px solid var(--cool-line);border-radius:12px;padding:22px;background:linear-gradient(180deg,var(--cool-soft),transparent 60%)}
+  .checks h4{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--cool);margin-bottom:16px}
+  .checks .c{display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-top:1px solid var(--hair)}
+  .checks .c:first-of-type{border-top:none}
+  .checks .c .ck{flex:none;color:var(--cool);font-family:"JetBrains Mono",monospace;font-weight:600}
+  .checks .c .ct{font-size:14px;color:var(--ink-dim)}
+  .checks .c .ct b{color:var(--ink);font-weight:600}
+
+  /* ladder (identity / recovery) */
+  .ladder{display:flex;flex-direction:column;gap:0;margin-top:14px}
+  .rung{display:grid;grid-template-columns:54px 1fr;gap:20px;padding:18px 0;border-bottom:1px solid var(--hair);align-items:start}
+  .rung:last-child{border-bottom:none}
+  .rung .lvl{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--warm);letter-spacing:.1em;padding-top:3px}
+  .rung .rn{font-family:"Fraunces",serif;font-size:20px;font-weight:500}
+  .rung .rd{font-size:14px;color:var(--ink-dim);margin-top:3px;max-width:60ch}
+  .rung .rd .mono{color:var(--cool);font-size:12.5px}
+  .rung.now{position:relative}
+  .rung.now .rn::after{content:"PHASE 0 · TODAY";font-family:"JetBrains Mono",monospace;font-size:9px;letter-spacing:.12em;color:var(--warm);border:1px solid var(--warm-line);border-radius:999px;padding:3px 8px;margin-left:12px;vertical-align:middle}
+
+  /* guardrails */
+  .guards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:14px}
+  @media(max-width:820px){.guards{grid-template-columns:1fr}}
+  .guard{border:1px solid var(--warm-line);border-radius:12px;padding:20px;background:linear-gradient(180deg,var(--warm-soft),transparent 65%)}
+  .guard .gn{display:flex;align-items:center;gap:10px;font-weight:600;font-size:15.5px;margin-bottom:8px}
+  .guard .gi{font-family:"JetBrains Mono",monospace;color:var(--warm);font-size:13px;border:1px solid var(--warm-line);border-radius:6px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;flex:none}
+  .guard .gd{font-size:13.5px;color:var(--ink-dim);line-height:1.5}
+
+  /* two-state (trust progression / pro) */
+  .states{display:grid;grid-template-columns:1fr auto 1fr;gap:24px;align-items:center;margin-top:12px}
+  @media(max-width:820px){.states{grid-template-columns:1fr}.states .arrowx{display:none}}
+  .state{border:1px solid var(--hair);border-radius:12px;padding:24px;background:var(--panel)}
+  .state .sk{font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:10px}
+  .state.a .sk{color:var(--warm)}.state.b .sk{color:var(--cool)}
+  .state h4{font-family:"Fraunces",serif;font-size:21px;font-weight:500;margin-bottom:10px}
+  .state p{font-size:14px;color:var(--ink-dim);line-height:1.55}
+  .arrowx{font-family:"JetBrains Mono",monospace;color:var(--ink-faint);font-size:24px;text-align:center}
+
+  /* roadmap */
+  .road{display:flex;flex-direction:column;gap:2px;margin-top:14px;counter-reset:r}
+  .road .r{display:grid;grid-template-columns:40px 1fr auto;gap:20px;align-items:center;padding:16px 18px;border:1px solid var(--hair);border-radius:10px;background:var(--panel);transition:border-color .3s,transform .3s var(--ease)}
+  .road .r:hover{border-color:var(--cool-line);transform:translateX(4px)}
+  .road .r .rnum{font-family:"JetBrains Mono",monospace;color:var(--cool);font-size:13px}
+  .road .r .rname{font-weight:600;font-size:15.5px}
+  .road .r .rname small{display:block;color:var(--ink-dim);font-weight:400;font-size:13px;margin-top:2px}
+  .road .r .rdep{font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.06em;color:var(--ink-faint);text-align:right;white-space:nowrap}
+
+  .ext{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:22px 0 0}
+  @media(max-width:760px){.ext{grid-template-columns:1fr}}
+  .ext .e{border:1px solid var(--hair);border-left:2px solid var(--cool);border-radius:9px;padding:16px 18px;background:var(--panel)}
+  .ext .e .en{font-weight:600;font-size:15px;margin-bottom:4px}
+  .ext .e .ed{font-size:13px;color:var(--ink-dim);line-height:1.5}
+  .ext .e .ed code{font-family:"JetBrains Mono",monospace;color:var(--cool);font-size:12px}
+
+  /* reveal */
+  .reveal{opacity:0;transform:translateY(22px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+  .reveal.in{opacity:1;transform:none}
+  .reveal.in [data-stagger]{animation:rise .7s var(--ease) backwards}
+  [data-stagger]{}
+  @keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+
+  footer{max-width:var(--maxw);margin:0 auto;padding:50px 40px 90px;border-top:1px solid var(--hair);
+    font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--ink-faint);letter-spacing:.04em;display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px}
+  footer b{color:var(--ink-dim)}
+
+  @media(max-width:1280px){nav.dots{display:none}}
+  @media(max-width:620px){.unit{grid-template-columns:1fr;gap:10px}.unit__owns{text-align:left;max-width:none}.step+.step{margin-left:0;margin-top:30px}.step+.step::before{left:50%;top:-22px;width:1px;height:18px}.step+.step::after{left:50%;top:-7px;transform:translateX(-50%) rotate(135deg)}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wordmark">HIFI<b>PASS</b></div>
+  <div class="topmeta">Backbone · v0 · 2026-06-03</div>
+</div>
+
+<nav class="dots" aria-label="Sections">
+  <a href="#hero"><span class="pip"></span><span class="lbl">Overview</span></a>
+  <a href="#arch"><span class="pip"></span><span class="lbl">01 · Architecture</span></a>
+  <a href="#tiers"><span class="pip"></span><span class="lbl">02 · Data tiers</span></a>
+  <a href="#identity"><span class="pip"></span><span class="lbl">03 · Identity</span></a>
+  <a href="#mint"><span class="pip"></span><span class="lbl">04 · Mint-or-claim</span></a>
+  <a href="#transfer"><span class="pip"></span><span class="lbl">05 · Transfer</span></a>
+  <a href="#disclose"><span class="pip"></span><span class="lbl">06 · Disclosure</span></a>
+  <a href="#recovery"><span class="pip"></span><span class="lbl">07 · Recovery</span></a>
+  <a href="#trust"><span class="pip"></span><span class="lbl">08 · Trust & Pro</span></a>
+  <a href="#build"><span class="pip"></span><span class="lbl">09 · Build order</span></a>
+</nav>
+
+<!-- ============ HERO ============ -->
+<section id="hero" class="hero">
+  <div class="reveal in">
+    <div class="kicker">Digital Product Passport · provenance for hi-fi</div>
+    <h1>Passport<span class="l2">Registry <em>Backbone</em></span></h1>
+    <svg class="wave" viewBox="0 0 760 54" preserveAspectRatio="none" aria-hidden="true">
+      <path class="w1" d="M0,27 L120,27 Q150,27 158,12 T182,42 T206,12 T230,42 T254,27 L420,27 Q450,27 460,8 T486,46 T512,27 L760,27"/>
+      <path class="w2" d="M0,33 L200,33 Q220,33 232,22 T262,40 T292,33 L520,33 Q545,33 556,20 T586,44 T612,33 L760,33"/>
+    </svg>
+    <p class="sub">A neutral, VIN-style registry where <b>one physical unit maps to exactly one passport</b> — provable ownership, selective disclosure, and custodial recovery, with all cryptography hidden from the user.</p>
+    <div class="legend" style="margin-top:24px">
+      <div class="li"><span class="sw warm"></span> Custody · human · ownership</div>
+      <div class="li"><span class="sw cool"></span> Cryptographic · registry · verifiable</div>
+    </div>
+    <div class="meta">
+      <span><b>STATUS</b> &nbsp;Backbone decision doc</span>
+      <span><b>ENGINE</b> &nbsp;@hifipass/passport-core</span>
+      <span><b>SUPERSEDES</b> &nbsp;hifisync §9</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 01 ARCHITECTURE ============ -->
+<section id="arch">
+  <div class="reveal">
+    <div class="eyebrow"><span class="num">01</span> / The stack</div>
+    <h2>Reuse lives in the <em>core</em>,<br>not the product.</h2>
+    <p class="lede">A pure provenance engine at the bottom; a neutral, multi-writer registry above it; the consumer app and custodian on top. <b>agropass</b> is the sibling proof that the engine — not hifipass — is the general-purpose part.</p>
+  </div>
+  <div class="rack reveal">
+    <div class="unit u-core" data-stagger style="animation-delay:.05s">
+      <span class="screw s1"></span><span class="screw s2"></span><span class="screw s3"></span><span class="screw s4"></span>
+      <div class="unit__tag">L0 · Core</div>
+      <div><div class="unit__name">passport-core <small>this repo · domain-neutral</small></div></div>
+      <div class="unit__owns">chains · signing · verify<br>custody handover<br>commitments · presentations</div>
+    </div>
+    <div class="unit u-pass" data-stagger style="animation-delay:.12s">
+      <span class="screw s1"></span><span class="screw s2"></span><span class="screw s3"></span><span class="screw s4"></span>
+      <div class="unit__tag">L1 · Registry</div>
+      <div><div class="unit__name">hifipass <small>the hi-fi passport · API + MCP</small></div><div class="unit__desc">Public projection + commitments. The VIN-like lookup service. Anchoring.</div></div>
+      <div class="unit__owns">public tier · commitments<br>(product, serial) anchor<br>lookup · notary</div>
+    </div>
+    <div class="unit u-agro" data-stagger style="animation-delay:.19s">
+      <span class="screw s1"></span><span class="screw s2"></span><span class="screw s3"></span><span class="screw s4"></span>
+      <div class="unit__tag">L1 · Sibling</div>
+      <div><div class="unit__name">agropass <small>fruit / agriculture · same engine</small></div><div class="unit__desc">Out of scope here — named so the backbone stays reusable.</div></div>
+      <div class="unit__owns">own registry<br>own domain schema</div>
+    </div>
+    <div class="unit u-sync" data-stagger style="animation-delay:.26s">
+      <span class="screw s1"></span><span class="screw s2"></span><span class="screw s3"></span><span class="screw s4"></span>
+      <div class="unit__tag">L2 · App + Custodian</div>
+      <div><div class="unit__name">hifisync <small>consumer app · first privileged client</small></div><div class="unit__desc">Owner accounts, key custody &amp; signing, the key↔person map, recovery.</div></div>
+      <div class="unit__owns">keys · signing<br>private values<br>recovery custodianship</div>
+    </div>
+  </div>
+  <p class="note reveal" style="margin-top:18px">Manufacturers, distributors &amp; retailers are B2B actors — they integrate <span style="color:var(--cool)">hifipass</span> directly. hifisync is the first client, not the only one.</p>
+</section>
+
+<!-- ============ 02 DATA TIERS ============ -->
+<section id="tiers">
+  <div class="reveal">
+    <div class="eyebrow"><span class="num">02</span> / What the registry stores</div>
+    <h2>Two tiers. Privacy lives in the <span class="cy">split</span>.</h2>
+    <p class="lede">The registry can be public, replicated, or anchored to a ledger — so it can <b>never</b> hold raw private values. It holds VIN-grade public fields and cryptographic commitments. Raw values stay in custody.</p>
+  </div>
+  <div class="tiers">
+    <div class="tier pub reveal" data-stagger>
+      <div class="tag">Public · lookup-able by serial</div>
+      <h3>VIN-grade tier</h3>
+      <ul>
+        <li><b>Passport exists</b> for (product, serial)</li>
+        <li>Product <b>model</b> + public passport id</li>
+        <li><b>Purchase year</b></li>
+        <li>Current <b>owner pseudonym key</b></li>
+        <li><b>Number of transfers</b> + timeline</li>
+        <li><b>Assurance level</b> (self / receipt / channel)</li>
+      </ul>
+      <div class="foot">PII-free by construction → safe even if fully enumerated, exactly like a VIN.</div>
+    </div>
+    <div class="tier prv reveal" data-stagger style="animation-delay:.1s">
+      <div class="tag">Committed · raw values in custody</div>
+      <h3>Sensitive tier</h3>
+      <ul>
+        <li>Raw <b>serial number</b></li>
+        <li>The owner's <b>real identity</b> (key↔person)</li>
+        <li><b>Receipts</b> &amp; proof of purchase</li>
+        <li><b>Service history</b></li>
+        <li><b>Price</b> &amp; invoices</li>
+      </ul>
+      <div class="foot mono">on registry → hash(value ‖ salt)<br>in custody &nbsp;→ (value, salt) openings</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 03 IDENTITY ============ -->
+<section id="identity">
+  <div class="reveal">
+    <div class="eyebrow"><span class="num">03</span> / Who an owner is</div>
+    <h2>One reusable key.<br><em>Custody climbs, identity stays.</em></h2>
+    <p class="lede">An owner is a persistent identity — <b>one keypair</b> that signs across many passports. The registry sees a pseudonymous key; hifisync privately maps it to a person. The <b>same public key</b> rides up the custody ladder.</p>
+  </div>
+  <div class="ladder reveal">
+    <div class="rung now" data-stagger>
+      <div class="lvl">TIER 0</div>
+      <div><div class="rn">Custodial</div><div class="rd">hifisync holds the key for you (platform KMS, Privy-style). Crypto is fully hidden. <span class="mono">recovery = account recovery</span> — no chain event.</div></div>
+    </div>
+    <div class="rung" data-stagger style="animation-delay:.07s">
+      <div class="lvl">TIER 1</div>
+      <div><div class="rn">Device-bound</div><div class="rd">The key moves into your device's secure enclave. <span class="mono">recovery = guardian-authorized rotation</span>, on-chain &amp; transparent.</div></div>
+    </div>
+    <div class="rung" data-stagger style="animation-delay:.14s">
+      <div class="lvl">TIER 2</div>
+      <div><div class="rn">Sovereign</div><div class="rd">You hold the key outright. <span class="mono">recovery = k-of-n guardians</span> (social / MPC) — no lock-in to hifisync. Ultra tier.</div></div>
+    </div>
+  </div>
+  <p class="note reveal" style="margin-top:20px">Payoff: because identity is one key, a <span style="color:var(--warm)">single recovery re-binds your whole collection</span> at once — and correlation across your gear is the accepted, pseudonymous cost.</p>
+</section>
+
+<!-- ============ 04 MINT-OR-CLAIM ============ -->
+<section id="mint">
+  <div class="reveal">
+    <div class="eyebrow"><span class="num">04</span> / Registration</div>
+    <h2>One unit ⇒ <span class="cy">one passport</span>, ever.</h2>
+    <p class="lede">The subject id is derived deterministically from the unit, so registration and "reuse what's in custody" are the <b>same operation</b>: mint-or-claim on the anchor. No manufacturer cooperation required.</p>
+  </div>
+  <div class="flow reveal">
+    <div class="step cool" data-stagger>
+      <div class="k">Input</div><div class="t">product id + serial</div>
+      <div class="d">Read off the device — VIN-style.</div>
+    </div>
+    <div class="step cool" data-stagger style="animation-delay:.08s">
+      <div class="k">Anchor</div><div class="t">compute the subject id</div>
+      <div class="mono hash">hash(product ‖ serial)</div>
+    </div>
+    <div class="step" data-stagger style="animation-delay:.16s">
+      <div class="k">Lookup</div><div class="t">registry query</div>
+      <div class="d">Rate-limited service. Found, or not?</div>
+    </div>
+    <div class="step" data-stagger style="animation-delay:.24s">
+      <div class="k">Branch</div><div class="t">mint &nbsp;·&nbsp; or &nbsp;·&nbsp; claim</div>
+      <div class="d"><b style="color:var(--cool)">not found</b> → mint genesis<br><b style="color:var(--warm)">found</b> → claim the existing one</div>
+    </div>
+  </div>
+  <div class="twocol" style="margin-top:24px">
+    <div class="checks reveal" style="border-color:var(--cool-line)">
+      <h4>Mint · assurance is layered</h4>
+      <div class="c"><span class="ck">self</span><span class="ct">Owner self-registers. Works today, zero integration.</span></div>
+      <div class="c"><span class="ck">receipt</span><span class="ct">Proof-of-purchase scan, custodian-reviewed.</span></div>
+      <div class="c"><span class="ck">channel</span><span class="ct"><b>Gold tier</b> — distributor/manufacturer code. Upgrades for free if a maker ever opts in.</span></div>
+    </div>
+    <div class="reveal">
+      <p class="lede" style="font-size:16px">A plain serial can be cloned — so a passport records provenance <b>as claimed</b>, never anti-counterfeit on its own. Assurance is the honest dial, and it strengthens as trusted parties join.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 05 TRANSFER ============ -->
+<section id="transfer">
+  <div class="reveal">
+    <div class="eyebrow"><span class="num">05</span> / Change of hands</div>
+    <h2>Two-party transfer,<br>with a <em>custody fallback</em>.</h2>
+    <p class="lede">Only the current owner can hand a passport on. The buyer must accept — and if they won't, the seller still gets <b>off the record</b>. Prior owners stay in the append-only chain forever (that history is the value).</p>
+  </div>
+  <div class="reveal">
+    <div class="propose" data-stagger>
+      <span class="badge">Seller proposes</span>
+      <span class="txt">Current owner signs a <b>transfer proposal</b> naming the buyer's identity key.</span>
+    </div>
+    <div class="branch-stem"></div>
+    <div class="lanes">
+      <div class="lane ok" data-stagger>
+        <div class="lane__h"><span class="name">Accept</span><span class="tg">happy path</span></div>
+        <div class="lane__b">
+          <div class="lstep"><span class="i">1</span><span class="lt">Buyer <b>signs acceptance</b></span></div>
+          <div class="lstep"><span class="i">2</span><span class="lt"><span class="mono" style="color:var(--cool)">custody_change</span> — both signatures present</span></div>
+          <div class="lstep"><span class="i">3</span><span class="lt">Buyer becomes owner <span class="pill pro">claim · Pro</span></span></div>
+        </div>
+      </div>
+      <div class="lane esc" data-stagger style="animation-delay:.08s">
+        <div class="lane__h"><span class="name">Decline</span><span class="tg">→ escrow</span></div>
+        <div class="lane__b">
+          <div class="lstep"><span class="i">1</span><span class="lt">Buyer won't / can't accept</span></div>
+          <div class="lstep"><span class="i">2</span><span class="lt">Seller <b>releases</b> to custody <span class="pill free">release · free</span></span></div>
+          <div class="lstep"><span class="i">3</span><span class="lt">Held by hifisync <span class="mono" style="font-size:11px">(+ mfr co-approval, high-value)</span> — "unclaimed"</span></div>
+        </div>
+      </div>
+      <div class="lane claim" data-stagger style="animation-delay:.16s">
+        <div class="lane__h"><span class="name">Claim</span><span class="tg">from custody</span></div>
+        <div class="lane__b">
+          <div class="lstep"><span class="i">1</span><span class="lt">Holder <b>proves possession</b> (receipt / photos)</span></div>
+          <div class="lstep"><span class="i">2</span><span class="lt">Custodian adjudicates → sets assurance</span></div>
+          <div class="lstep"><span class="i">3</span><span class="lt"><span class="mono" style="color:var(--cool)">custody_change</span> → new owner <span class="pill pro">Pro</span></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="note reveal" style="margin-top:20px">"Unclaimed, held by a custodian" is the <span style="color:var(--warm)">same state</span> a passport sits in right after a manufacturer registers it — so registration, abandonment &amp; recovery all flow through one primitive.</p>
+</section>
+
+<!-- ============ 06 DISCLOSURE ============ -->
+<section id="disclose">
+  <div class="reveal">
+    <div class="eyebrow"><span class="num">06</span> / Proof &amp; disclosure</div>
+    <h2>The VIN-check link is a<br><span class="cy">verifiable presentation</span>.</h2>
+    <p class="lede">"Reveal full details" and "prove I'm the current owner to a buyer" are <b>one primitive</b> — selective disclosure bound to a signature from the current controller. Field-level: show the serial &amp; service history, hide the price.</p>
+  </div>
+  <div class="flow reveal" style="margin-bottom:26px">
+    <div class="step cool" data-stagger>
+      <div class="k">At mint</div><div class="t">commit each field</div>
+      <div class="mono hash">commit = hash(value ‖ salt)</div>
+    </div>
+    <div class="step warm" data-stagger style="animation-delay:.08s">
+      <div class="k">Owner</div><div class="t">build a short-lived link</div>
+      <div class="d">Chosen openings + signature over <span class="mono" style="color:var(--cool);font-size:11px">{anchor, nonce, expiry}</span></div>
+    </div>
+    <div class="step cool" data-stagger style="animation-delay:.16s">
+      <div class="k">Buyer</div><div class="t">verify</div>
+      <div class="d">Operator-rendered now; self-verifiable by anyone later.</div>
+    </div>
+  </div>
+  <div class="twocol">
+    <div class="checks reveal" data-stagger>
+      <h4>The verifier checks four things</h4>
+      <div class="c"><span class="ck">01</span><span class="ct"><b>Signature</b> is valid</span></div>
+      <div class="c"><span class="ck">02</span><span class="ct">That key is the <b>current head</b> of the chain — current owner, not a past one</span></div>
+      <div class="c"><span class="ck">03</span><span class="ct">Each opening <b>hashes to its commitment</b> on the registry</span></div>
+      <div class="c"><span class="ck">04</span><span class="ct">The link <b>hasn't expired</b></span></div>
+    </div>
+    <div class="reveal" data-stagger style="animation-delay:.1s">
+      <p class="lede" style="font-size:16px">Because the commitments are embedded from <b>day one</b>, the same signed bundle that hifipass renders today becomes verifiable by any third party — with zero trust in the operator — the moment keys move to users. No migration.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 07 RECOVERY ============ -->
+<section id="recovery">
+  <div class="reveal">
+    <div class="eyebrow"><span class="num">07</span> / Lost the key</div>
+    <h2>The custodian as a<br><em>fenced guardian</em>.</h2>
+    <p class="lede">Recovery is the one sanctioned exception to "only the current controller signs" — which makes it a theft vector too. So the design is really about <b>guardrails</b>. Default policy: <span class="mono" style="color:var(--warm)">{hifisync}, 1-of-1</span>.</p>
+  </div>
+  <div class="guards reveal">
+    <div class="guard" data-stagger>
+      <div class="gn"><span class="gi">01</span> Identity check</div>
+      <div class="gd">The custodian confirms you're the account owner — off-chain — before acting.</div>
+    </div>
+    <div class="guard" data-stagger style="animation-delay:.08s">
+      <div class="gn"><span class="gi">02</span> Time-lock</div>
+      <div class="gd">A recovery is announced &amp; delayed (~7 days). If the old key resurfaces, it can <b>cancel</b>. This stops silent theft.</div>
+    </div>
+    <div class="guard" data-stagger style="animation-delay:.16s">
+      <div class="gn"><span class="gi">03</span> On-chain &amp; transparent</div>
+      <div class="gd">The recovery is itself an append — visible &amp; provable forever. A malicious rotation can't hide.</div>
+    </div>
+  </div>
+  <p class="note reveal" style="margin-top:22px">One recovery re-binds the reusable identity across <span style="color:var(--warm)">all the owner's passports at once</span>. Today it's just account recovery — the on-chain guardian primitive sits dormant until self-custody, exactly like <span class="mono">custody_change</span> does now.</p>
+</section>
+
+<!-- ============ 08 TRUST + PRO ============ -->
+<section id="trust">
+  <div class="reveal">
+    <div class="eyebrow"><span class="num">08</span> / Trust &amp; monetization</div>
+    <h2>Operator-trusted now.<br><span class="cy">Verifiable-ready</span> always.</h2>
+    <p class="lede">The same discipline runs through everything: ship the simple custodial experience, but shape the data so trust-minimized guarantees switch on later — no rebuild.</p>
+  </div>
+  <div class="states reveal">
+    <div class="state a" data-stagger>
+      <div class="sk">Phase 0 · today</div>
+      <h4>Operator-rendered</h4>
+      <p>The buyer trusts hifipass.com to render lookups, disclosures &amp; proof links correctly — Carfax-style. Keys are platform-held.</p>
+    </div>
+    <div class="arrowx">→</div>
+    <div class="state b" data-stagger style="animation-delay:.1s">
+      <div class="sk">As keys move to users</div>
+      <h4>Self-verifiable</h4>
+      <p>The same signed objects verify against public commitments + chain head, with zero trust in the operator. The commitments were there all along.</p>
+    </div>
+  </div>
+  <div style="margin-top:26px" class="reveal">
+    <p class="note" style="margin-bottom:12px;color:var(--ink-dim)">PRO GATING — the two write actions pay; everything read is free and persists regardless of Pro.</p>
+    <div class="flow">
+      <div class="step warm" data-stagger><div class="k">Write</div><div class="t">Mint <span class="pill pro">Pro</span></div><div class="d">Create a passport.</div></div>
+      <div class="step warm" data-stagger style="animation-delay:.07s"><div class="k">Write</div><div class="t">Claim <span class="pill pro">Pro</span></div><div class="d">The sale funnels the buyer into Pro at claim time.</div></div>
+      <div class="step" data-stagger style="animation-delay:.14s"><div class="k">Write</div><div class="t">Release <span class="pill free">Free</span></div><div class="d">A lapsed seller can always let go — no orphaned devices.</div></div>
+      <div class="step" data-stagger style="animation-delay:.21s"><div class="k">Read</div><div class="t">Browse · verify <span class="pill free">Free</span></div><div class="d">Provenance is never destroyed.</div></div>
+    </div>
+    <p class="note" style="margin-top:14px">Marketplace (listings / for-sale / discovery) is <span style="color:var(--ink-dim)">deliberately deferred</span> — a separate "Guardrail 7" decision.</p>
+  </div>
+</section>
+
+<!-- ============ 09 BUILD ORDER ============ -->
+<section id="build">
+  <div class="reveal">
+    <div class="eyebrow"><span class="num">09</span> / What gets built</div>
+    <h2>Four engine extensions,<br><span class="cy">six sub-specs</span>.</h2>
+    <p class="lede">As much of the backbone as possible lives in the pure, domain-neutral core — so <b>agropass inherits it for free</b>.</p>
+  </div>
+  <div class="ext reveal">
+    <div class="e" data-stagger><div class="en">Two-party transfer</div><div class="ed">propose → accept; custody moves only when <code>both</code> have signed.</div></div>
+    <div class="e" data-stagger style="animation-delay:.06s"><div class="en">Recovery-authorized custody_change</div><div class="ed">a rotation authorized by a <code>recovery policy</code> instead of the current controller.</div></div>
+    <div class="e" data-stagger style="animation-delay:.12s"><div class="en">Field commitments</div><div class="ed"><code>commit(value, salt)</code> + verify-opening, in the attestation.</div></div>
+    <div class="e" data-stagger style="animation-delay:.18s"><div class="en">Verifiable presentation</div><div class="ed">build / verify the signed disclosure bundle against head + commitments.</div></div>
+  </div>
+  <div class="road reveal" style="margin-top:24px">
+    <div class="r" data-stagger><span class="rnum">01</span><span class="rname">Engine extensions<small>commitments + presentation, then two-party transfer, then recovery</small></span><span class="rdep">depends on · nothing</span></div>
+    <div class="r" data-stagger style="animation-delay:.05s"><span class="rnum">02</span><span class="rname">hifipass registry + VIN lookup<small>public projection, anchor, rate-limited API/MCP, catalog</small></span><span class="rdep">depends on · 01</span></div>
+    <div class="r" data-stagger style="animation-delay:.1s"><span class="rnum">03</span><span class="rname">Registration &amp; mint-or-claim<small>idempotent anchor flow, assurance levels</small></span><span class="rdep">depends on · 01, 02</span></div>
+    <div class="r" data-stagger style="animation-delay:.15s"><span class="rnum">04</span><span class="rname">Transfer + escrow + claim<small>two-party, release-to-custody, adjudication, Pro-gating</small></span><span class="rdep">depends on · 01–03</span></div>
+    <div class="r" data-stagger style="animation-delay:.2s"><span class="rnum">05</span><span class="rname">Disclosure + proof links<small>verifiable-presentation UX + verifier page</small></span><span class="rdep">depends on · 01, 02</span></div>
+    <div class="r" data-stagger style="animation-delay:.25s"><span class="rnum">06</span><span class="rname">Recovery<small>policy, guardian flow, time-lock + transparency</small></span><span class="rdep">depends on · 01, 02</span></div>
+  </div>
+</section>
+
+<footer>
+  <span><b>HiFiPass</b> — passport registry backbone · design decision doc</span>
+  <span>2026-06-03 · superseding hifisync §9 · <b>@hifipass/passport-core</b></span>
+</footer>
+
+<script>
+  // scroll reveals
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} });
+  },{threshold:.12, rootMargin:'0px 0px -8% 0px'});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+  // stagger children inside revealed blocks
+  const so = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(!e.isIntersecting) return;
+      e.target.querySelectorAll('[data-stagger]').forEach((c,i)=>{
+        if(!c.style.animationDelay) c.style.animationDelay=(i*0.06)+'s';
+      });
+      so.unobserve(e.target);
+    });
+  },{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el=>so.observe(el));
+
+  // active section in side nav
+  const links = [...document.querySelectorAll('nav.dots a')];
+  const map = new Map(links.map(a=>[a.getAttribute('href').slice(1), a]));
+  const navio = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        links.forEach(l=>l.classList.remove('active'));
+        const a = map.get(e.target.id); if(a) a.classList.add('active');
+      }
+    });
+  },{threshold:.5, rootMargin:'-20% 0px -40% 0px'});
+  document.querySelectorAll('section').forEach(s=>navio.observe(s));
+</script>
+</body>
+</html>
