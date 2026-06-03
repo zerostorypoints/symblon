@@ -106,4 +106,4 @@ Implemented: the full attestation model, signing/verification, controller-tracki
 
 ## License
 
-MIT © 2026 Piotr Dziubecki
+Apache-2.0 © 2026 Piotr Dziubecki

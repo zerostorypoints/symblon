@@ -53,4 +53,5 @@ Other repos consume this engine, so decide and ship the distribution path:
 ## Housekeeping
 - [ ] Remove the trivial `__tests__/smoke.test.ts` (a scaffold artifact).
 - [x] **Renamed `@hifipass/passport-core` → `@symblon/core`** (2026-06-03) — domain-neutral, ownable brand (`symblon.com` + npm `@symblon` free; the split-token *symbolon* metaphor fits two-party transfer / commitment-opening match). GitHub repo `hifipass` → `symblon`; frees the name "hifipass" for the hi-fi **registry product**.
-- [ ] **Open-source the core** — flip repo public + `npm publish @symblon/core`, and decide license (MIT today → Apache-2.0 leaning, for the explicit patent grant). Needs the user's npm org `@symblon` + GitHub org (`symblonhq`).
+- [x] **License = Apache-2.0** (2026-06-03) — switched from MIT for the explicit patent grant; `LICENSE` is the canonical Apache-2.0 text.
+- [ ] **Open-source the core** — flip repo public + `npm publish @symblon/core`. Needs the user's npm org `@symblon` + GitHub org (`symblonhq`).
