@@ -1,0 +1,46 @@
+{
+  "name": "@hifipass/passport-core",
+  "version": "0.1.0",
+  "description": "Pure provenance engine — signed, hash-linked, append-only attestation chains. No UI, no framework, no I/O.",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": "./index.ts",
+    "./types/*": "./types/*.ts",
+    "./schemas/*": "./schemas/*.ts"
+  },
+  "files": [
+    "index.ts",
+    "types",
+    "schemas",
+    "*.ts",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "build": "tsc --noEmit",
+    "lint": "tsc --noEmit",
+    "example": "tsx examples/basic-passport.ts"
+  },
+  "keywords": [
+    "provenance",
+    "digital-product-passport",
+    "attestation",
+    "verifiable-credentials",
+    "append-only-log",
+    "ed25519"
+  ],
+  "dependencies": {
+    "@noble/curves": "^1.6.0",
+    "@noble/hashes": "^1.5.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.0"
+  }
+}
