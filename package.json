@@ -33,7 +33,7 @@
     "lint": "tsc --noEmit",
     "build": "tsc -p tsconfig.build.json",
     "clean": "rm -rf dist",
-    "prepublishOnly": "npm run clean && npm run build",
+    "prepare": "npm run build",
     "example": "tsx examples/basic-passport.ts"
   },
   "keywords": [
