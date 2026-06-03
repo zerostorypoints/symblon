@@ -7,7 +7,9 @@ _Last updated: 2026-06-03_
 `@hifipass/passport-core` **v0.1.0** — the pure provenance engine.
 
 - Complete and tested: **36 tests**, strict TypeScript clean (`npm run build`), runnable example (`npm run example`).
-- Ships a compiled `dist` build (ESM `.js` + `.d.ts`) via `npm run build`; `exports`/`main`/`types` point at `dist/`. **Not yet published** to a registry.
+- Ships a compiled `dist` build (ESM `.js` + `.d.ts`) via `npm run build`; `exports`/`main`/`types` point at `dist/`.
+- **Distribution = private git dependency** (tagged releases). Consumers install `github:piotr-dziubecki/hifipass#v0.1.0`; `prepare` builds `dist` on install. No registry.
+- **CI** runs typecheck + 36 tests + build on push/PR (GitHub Actions, Node 24) — green.
 - **Extracted from the hifisync monorepo on 2026-06-03; the monorepo copy was removed.** This repo is now the single source of truth for the engine.
 - **Not published** to any registry and **not wired** into any consumer (deliberate, this session).
 
@@ -29,12 +31,12 @@ The full design and the detailed implementation plans live in the **hifisync** r
 ### 1. Distribution — unblocks every consumer
 Other repos consume this engine, so decide and ship the distribution path:
 
-- [x] **Compiled `dist` build** — `npm run build` emits ESM `dist/*.js` + `.d.ts`; `exports`/`main`/`types` point at `dist/`; `prepublishOnly` rebuilds. _(Done 2026-06-03.)_
-- [ ] **Publish `@hifipass/passport-core` privately** — GitHub Packages (same account) or a private npm scope — **or** consume via git URL. Pick one; document the install command.
-- [ ] **Add CI** — a GitHub Action running `npm test` + `npm run build` on push/PR.
+- [x] **Compiled `dist` build** — `npm run build` emits ESM `dist/*.js` + `.d.ts`; `exports`/`main`/`types` point at `dist/`; `prepare` rebuilds (also enables git-dep installs). _(Done 2026-06-03.)_
+- [x] **Distribution = private git dependency, tagged** _(decided 2026-06-03)_ — consumers install `github:piotr-dziubecki/hifipass#v0.1.0`. GitHub Packages registry was declined (its scope-must-match-owner rule would force a rename to `@piotr-dziubecki/*` or a `hifipass` org); revisit only if a non-git consumer needs it.
+- [x] **CI** — GitHub Actions runs typecheck + 36 tests + build on push/PR (Node 24). Green.
 
 ### 2. First consumer — hifisync Phase 0 (Plan 2)
-- Lives in the **hifisync** repo, not here. It imports this engine via the distribution chosen in step 1 (replacing the old `@hifisync/passport-core` workspace package, now removed).
+- Lives in the **hifisync** repo, not here. Add this engine as a dependency — `"@hifipass/passport-core": "github:piotr-dziubecki/hifipass#v0.1.0"` — replacing the old `@hifisync/passport-core` workspace package (now removed). Imports/API are identical.
 - **Blocked on** account-model spec #1 (the `entitlements` table): Plan 2's Pro gate (`assertActivePro`) is fail-closed until entitlements exist. Build entitlements first.
 - Then follow Plan 2: `passport_attestations` table + `device_passports` projection + platform-KMS `Signer` + Supabase `IntegritySubstrate` + Pro-gated mint/transfer.
 

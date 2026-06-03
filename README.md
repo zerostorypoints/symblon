@@ -7,8 +7,10 @@ Tamper-evidence **without a blockchain**: each record carries the hash of the on
 ## Install
 
 ```bash
-npm install @hifipass/passport-core
-# crypto deps come with it: @noble/curves, @noble/hashes, zod
+# private git dependency, pinned to a release tag:
+npm install github:piotr-dziubecki/hifipass#v0.1.0
+# installs as @hifipass/passport-core; builds dist on install (prepare);
+# crypto deps (@noble/curves, @noble/hashes, zod) come with it
 ```
 
 > Ships compiled ESM (`dist/*.js`) with type declarations (`dist/*.d.ts`) — consumable by any TypeScript or JavaScript project. Build it with `npm run build`; the published artifact is `dist/`, regenerated automatically on publish via `prepublishOnly`.
