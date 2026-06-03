@@ -12,6 +12,7 @@ function content(a: AttestationInput): Record<string, unknown> {
     type: a.type,
     claim: a.claim,
     assurance: a.assurance,
+    commitments: a.commitments,
     occurredAt: a.occurredAt,
     recordedAt: a.recordedAt,
     prevHash: a.prevHash,

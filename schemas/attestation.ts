@@ -22,6 +22,7 @@ export const AttestationSchema = z.object({
   type: z.string().min(1),
   claim: z.unknown(),
   assurance: z.string().min(1).optional(),
+  commitments: z.record(z.string().regex(/^[0-9a-f]{64}$/)).optional(),
   occurredAt: z.string().min(1),
   recordedAt: z.string().min(1),
   prevHash: z.string().nullable(),

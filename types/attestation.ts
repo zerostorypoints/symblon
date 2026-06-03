@@ -28,6 +28,11 @@ export type Attestation = {
   claim: unknown;
   /** Domain assurance vocab (hifipass: 'channel' | 'receipt' | 'self'). */
   assurance?: string | undefined;
+  /** Optional field commitments: field name → lowercase-hex SHA-256 of
+   *  canonicalize({ value, salt }). Covered by payloadHash, so signed and
+   *  tamper-evident. Raw (value, salt) openings live in custody and are
+   *  revealed via a Presentation. */
+  commitments?: Record<string, string> | undefined;
   /** Real-world event time (passed in). */
   occurredAt: string;
   /** Record time (passed in). */
