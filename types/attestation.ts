@@ -1,4 +1,4 @@
-// packages/passport-core/types/attestation.ts
+// types/attestation.ts
 
 /** What a passport is about. `scheme` is owned by the domain (e.g. 'hifisync.unit'). */
 export type Subject = { scheme: string; id: string };

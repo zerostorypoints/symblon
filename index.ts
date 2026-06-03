@@ -1,4 +1,4 @@
-// packages/passport-core/index.ts
+// index.ts
 export type {
   Subject,
   Issuer,

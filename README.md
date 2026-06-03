@@ -1,4 +1,4 @@
-# @hifipass/passport-core
+# @symblon/core
 
 A **pure provenance engine**: signed, hash-linked, append-only attestation chains for any physical or digital object. No UI, no framework, no I/O — just the cryptographic core and a clean data model. It powers **hifipass** (provenance for hi-fi gear) and is domain-neutral by design, so the same engine serves any Digital Product Passport use case (e.g. food/agriculture traceability).
 
@@ -8,8 +8,8 @@ Tamper-evidence **without a blockchain**: each record carries the hash of the on
 
 ```bash
 # private git dependency, pinned to a release tag:
-npm install github:piotr-dziubecki/hifipass#v0.1.1
-# installs as @hifipass/passport-core; builds dist on install (prepare);
+npm install github:piotr-dziubecki/symblon#v0.1.1
+# installs as @symblon/core; builds dist on install (prepare);
 # crypto deps (@noble/curves, @noble/hashes, zod) come with it
 ```
 
@@ -21,7 +21,7 @@ npm install github:piotr-dziubecki/hifipass#v0.1.1
 import {
   buildAttestation, signAttestation, verifyChain,
   type Signer, type PublicKeyResolver,
-} from "@hifipass/passport-core";
+} from "@symblon/core";
 
 // You own key custody (a KMS/enclave signer) and key lookup (a registry).
 const signer: Signer = { keyId: "platform:v1", sign: async (msg) => /* hex sig */ "" };

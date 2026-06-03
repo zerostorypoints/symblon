@@ -1,4 +1,4 @@
-// packages/passport-core/verify-attestation.ts
+// verify-attestation.ts
 import { ed25519 } from "@noble/curves/ed25519";
 import { hexToBytes, utf8ToBytes } from "@noble/hashes/utils";
 import { computePayloadHash } from "./build-attestation.js";

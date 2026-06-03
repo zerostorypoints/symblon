@@ -1,4 +1,4 @@
-// packages/passport-core/merkle.ts
+// merkle.ts
 import { sha256Hex } from "./hash.js";
 
 /**

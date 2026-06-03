@@ -9,7 +9,7 @@
 
 ## 1. Context & problem
 
-`@hifipass/passport-core` is a pure provenance engine: signed, hash-linked, append-only attestation chains per subject, with custody handover (`custody_change` + controller tracking), an `assurance` field, and a dormant Merkle root. It is domain-neutral by design.
+`@symblon/core` is a pure provenance engine: signed, hash-linked, append-only attestation chains per subject, with custody handover (`custody_change` + controller tracking), an `assurance` field, and a dormant Merkle root. It is domain-neutral by design.
 
 We want a set of **user-facing passport scenarios** to sit on top of that engine:
 
@@ -28,7 +28,7 @@ This design **consciously evolves** the existing hifisync account/actor model (i
 
 | Layer | What it is | Owns |
 |---|---|---|
-| **Core engine** (`passport-core`, this repo) | Domain-neutral provenance primitives | chains, signing, verification, custody handover, commitments, presentations, recovery semantics |
+| **Core engine** (`@symblon/core`, this repo) | Domain-neutral provenance primitives | chains, signing, verification, custody handover, commitments, presentations, recovery semantics |
 | **hifipass — the registry** | The *hi-fi* passport: registry backend + public API + MCP, built on the engine | the public projection + commitments, the VIN-like lookup service, anchoring |
 | **agropass — a sibling registry** | A *fruit / agriculture* passport on the same engine | its own registry + domain schema (out of scope here; named so the backbone stays reusable) |
 | **hifisync — the app + custodian** | The hi-fi consumer app, tightly integrated with hifipass | owner accounts, key custody + signing, **private field values**, the key↔person map, recovery custodianship, all owner UX |
@@ -140,7 +140,7 @@ The engine only lets the **current controller** sign a `custody_change`. Recover
 - **Phase-0 reality** — while hifisync *holds* the key (custodial), recovery is just **account recovery**: reauthenticate, regain the held key — no chain event. The guardian primitive sits dormant until self-custody, exactly like `custody_change` does today.
 - **Sovereign upgrade** — multi-guardian / social (k-of-n: hifisync + manufacturer + a trusted contact) is the **Ultra / sovereign-tier** option, so the owner is not locked to hifisync forever. Deferred.
 
-## 11. Engine extensions required (`passport-core`)
+## 11. Engine extensions required (`@symblon/core`)
 
 The backbone needs four additions to the pure engine, each domain-neutral so agropass inherits them:
 

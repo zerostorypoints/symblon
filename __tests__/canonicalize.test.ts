@@ -1,4 +1,4 @@
-// packages/passport-core/__tests__/canonicalize.test.ts
+// __tests__/canonicalize.test.ts
 import { describe, it, expect } from "vitest";
 import { canonicalize } from "../canonicalize.js";
 

@@ -1,4 +1,4 @@
-// packages/passport-core/types/seams.ts
+// types/seams.ts
 import type { Attestation, Subject } from "./attestation.js";
 
 /** Produces a signature. Implementations climb the custody ladder:

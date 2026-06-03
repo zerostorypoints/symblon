@@ -1,4 +1,4 @@
-// packages/passport-core/__tests__/verify-attestation.test.ts
+// __tests__/verify-attestation.test.ts
 import { describe, it, expect } from "vitest";
 import { buildAttestation } from "../build-attestation.js";
 import { signAttestation } from "../sign-attestation.js";

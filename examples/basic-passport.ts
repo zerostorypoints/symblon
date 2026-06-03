@@ -11,7 +11,7 @@
  * (key custody) and a `PublicKeyResolver` (key lookup) — here, in-memory
  * Ed25519 helpers. In a real app these are a KMS/secure-enclave signer and a
  * key registry. This example imports via the relative path; in your own
- * project you would `import { ... } from "@hifipass/passport-core"`.
+ * project you would `import { ... } from "@symblon/core"`.
  */
 import { ed25519 } from "@noble/curves/ed25519";
 import { bytesToHex, utf8ToBytes } from "@noble/hashes/utils";
@@ -79,7 +79,7 @@ async function main(): Promise<void> {
   const chain = [mint, toBob, handover, toCarol];
   const resolver = resolverFor([platform, phone]);
 
-  console.log("\n  @hifipass/passport-core — basic example\n");
+  console.log("\n  @symblon/core — basic example\n");
   console.log(`  subject:      ${subject.id}`);
   console.log(`  chain:        mint → transfer → custody_change → transfer-by-new-owner (${chain.length} links)`);
 

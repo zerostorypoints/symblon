@@ -1,4 +1,4 @@
-// packages/passport-core/__tests__/build-attestation.test.ts
+// __tests__/build-attestation.test.ts
 import { describe, it, expect } from "vitest";
 import { buildAttestation, computePayloadHash } from "../build-attestation.js";
 import type { AttestationInput } from "../types/attestation.js";

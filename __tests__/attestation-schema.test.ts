@@ -1,4 +1,4 @@
-// packages/passport-core/__tests__/attestation-schema.test.ts
+// __tests__/attestation-schema.test.ts
 import { describe, it, expect } from "vitest";
 import { AttestationSchema } from "../schemas/attestation.js";
 import { sha256Hex } from "../hash.js";

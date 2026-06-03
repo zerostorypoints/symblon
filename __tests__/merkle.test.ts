@@ -1,4 +1,4 @@
-// packages/passport-core/__tests__/merkle.test.ts
+// __tests__/merkle.test.ts
 import { describe, it, expect } from "vitest";
 import { computeMerkleRoot } from "../merkle.js";
 import { sha256Hex } from "../hash.js";

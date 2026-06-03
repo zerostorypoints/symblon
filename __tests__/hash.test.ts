@@ -1,4 +1,4 @@
-// packages/passport-core/__tests__/hash.test.ts
+// __tests__/hash.test.ts
 import { describe, it, expect } from "vitest";
 import { sha256Hex } from "../hash.js";
 

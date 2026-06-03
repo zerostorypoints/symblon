@@ -1,4 +1,4 @@
-// packages/passport-core/verify-chain.ts
+// verify-chain.ts
 import { bytesToHex } from "@noble/hashes/utils";
 import { verifyAttestation } from "./verify-attestation.js";
 import { CUSTODY_CHANGE, type Attestation } from "./types/attestation.js";

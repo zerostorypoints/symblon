@@ -1,4 +1,4 @@
-// packages/passport-core/build-attestation.ts
+// build-attestation.ts
 import { canonicalize } from "./canonicalize.js";
 import { sha256Hex } from "./hash.js";
 import type { AttestationInput, UnsignedAttestation } from "./types/attestation.js";

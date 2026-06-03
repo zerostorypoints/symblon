@@ -1,4 +1,4 @@
-// packages/passport-core/canonicalize.ts
+// canonicalize.ts
 
 /**
  * Deterministic JSON serialization: recursively sorted object keys, undefined

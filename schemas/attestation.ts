@@ -1,4 +1,4 @@
-// packages/passport-core/schemas/attestation.ts
+// schemas/attestation.ts
 import { z } from "zod";
 import type { Attestation } from "../types/attestation.js";
 

@@ -1,4 +1,4 @@
-// packages/passport-core/sign-attestation.ts
+// sign-attestation.ts
 import type { Attestation, UnsignedAttestation } from "./types/attestation.js";
 import type { Signer } from "./types/seams.js";
 
