@@ -54,4 +54,5 @@ Other repos consume this engine, so decide and ship the distribution path:
 - [ ] Remove the trivial `__tests__/smoke.test.ts` (a scaffold artifact).
 - [x] **Renamed `@hifipass/passport-core` → `@symblon/core`** (2026-06-03) — domain-neutral, ownable brand (`symblon.com` + npm `@symblon` free; the split-token *symbolon* metaphor fits two-party transfer / commitment-opening match). GitHub repo `hifipass` → `symblon`; frees the name "hifipass" for the hi-fi **registry product**.
 - [x] **License = Apache-2.0** (2026-06-03) — switched from MIT for the explicit patent grant; `LICENSE` is the canonical Apache-2.0 text.
-- [ ] **Open-source the core** — flip repo public + `npm publish @symblon/core`. Needs the user's npm org `@symblon` + GitHub org (`symblonhq`).
+- [x] **Placed under the `zerostorypoints` GitHub org** (2026-06-03) — `zerostorypoints/symblon`, part of the zerostorypoints.com product portfolio. `main` + tags (`v0.1.0`/`v0.1.1`/`v0.2.0`) pushed; repo still **private**.
+- [ ] **Open-source the core** — flip `zerostorypoints/symblon` public, claim the npm org `@symblon`, then `npm publish --access public @symblon/core`. (CI/Actions are free for public org repos; no Vercel involved — the engine is a library.)
