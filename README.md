@@ -8,7 +8,7 @@ Tamper-evidence **without a blockchain**: each record carries the hash of the on
 
 ```bash
 # private git dependency, pinned to a release tag:
-npm install github:piotr-dziubecki/symblon#v0.1.1
+npm install github:zerostorypoints/symblon#v0.2.0
 # installs as @symblon/core; builds dist on install (prepare);
 # crypto deps (@noble/curves, @noble/hashes, zod) come with it
 ```

@@ -6,10 +6,10 @@
   "author": "Piotr Dziubecki",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/piotr-dziubecki/symblon.git"
+    "url": "git+https://github.com/zerostorypoints/symblon.git"
   },
-  "homepage": "https://github.com/piotr-dziubecki/symblon#readme",
-  "bugs": "https://github.com/piotr-dziubecki/symblon/issues",
+  "homepage": "https://github.com/zerostorypoints/symblon#readme",
+  "bugs": "https://github.com/zerostorypoints/symblon/issues",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
