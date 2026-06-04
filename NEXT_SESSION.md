@@ -45,6 +45,14 @@ Other repos consume this engine, so decide and ship the distribution path:
 - [ ] **Public-ledger Merkle anchoring** — `computeMerkleRoot` already exists; add an anchor receipt + a verifier that proves "anchored before time T."
 - [ ] **Hypercore / Autobase `IntegritySubstrate`** — for the sovereign tier (P2P) and the fruit project's multi-writer chains.
 
+> **Storage substrates — specs written 2026-06-04** (in `docs/superpowers/specs/`). Turns the two storage bullets above into a concrete, sequenced workstream of reusable **engine-side** adapters behind the one `IntegritySubstrate` seam:
+> - `2026-06-04-storage-substrates-overview.md` — **start here**: Phase 0 (harden `append` to an atomic head-CAS + a shared `@symblon/substrate-conformance` suite + in-memory reference adapter), packaging (npm-workspaces monorepo), and the build order. **Revises §2 below:** the Supabase substrate should be a reusable engine-side package, not hifisync-internal, now that symblon serves hifipass *and* agrocontracts.
+> - `2026-06-04-substrate-sql.md` — Phase 1, Postgres/Supabase (custodial, ship first).
+> - `2026-06-04-substrate-pear.md` — Phase 2, Hypercore/Autobase (sovereign P2P); read its §4 design risk first.
+> - `2026-06-04-substrate-anchor.md` — Phase 3, public-ledger Merkle anchoring (add-on).
+>
+> Recommended next step: brainstorm → plan **Phase 0 + Phase 1** (contract + conformance + SQL adapter) — the minimum to put a product on real storage.
+
 ### 4. Custody ladder Phase 1 / 2 — the product headline (later, gated on mobile)
 - **Phase 1** device-bound keys (secure enclave) + **assisted / MPC recovery** — recovery UX is the dominant work.
 - **Phase 2** sovereign self-custody (Ultra tier) on a P2P substrate.
