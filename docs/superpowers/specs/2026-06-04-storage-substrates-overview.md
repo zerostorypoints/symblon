@@ -86,8 +86,8 @@ Build order: **0 → 1** is the minimum to put a real product on real storage; 2
 - W3C VC / EPCIS export adapters are a separate roadmap item (NEXT_SESSION §3), not storage.
 
 ## 7. Open questions (consolidated)
-1. `append` head-CAS as a contract requirement vs. a signature change (§3.1) — recommend contract.
-2. Monorepo restructure scope (§4).
+1. ~~`append` head-CAS as a contract requirement vs. a signature change (§3.1) — recommend contract.~~ **RESOLVED 2026-06-05 — contract + throw.** Keep `append(att): Promise<void>`; tighten the contract to an atomic check-and-set on `att.prevHash` vs. `head(subject)`; on mismatch throw a single engine-exported `HeadConflictError { subject, expected, actual }` (so every adapter throws the *same* class — the conformance suite asserts `instanceof`). This is the engine's first *thrown* typed error, which is consistent: the pure verifiers keep result-objects (expected branches), while `append` is an effectful I/O boundary where a head race is exceptional. Signature is unchanged because `att.prevHash` already carries the expected head (an `expectedHead` arg would be redundant and could desync).
+2. ~~Monorepo restructure scope (§4).~~ **RESOLVED 2026-06-05 — minimal.** Core stays flat at the repo root as `@symblon/core` (so the `github:zerostorypoints/symblon#vX` git-dep install + `prepare` build stay untouched — no retag, no consumer changes). Add `workspaces: ["packages/*"]` to the root and create `packages/substrate-conformance` (suite + in-memory reference adapter) and `packages/substrate-sql`. The full restructure (move core → `packages/core`) is deferred to the open-source / `npm publish` flip (Housekeeping in NEXT_SESSION), since npm git-deps cannot install a subdirectory package and the publish benefit isn't needed yet.
 3. Where the `PublicKeyResolver` store lives per adapter (§3.4).
 4. SQL: separate `heads` table vs. derive from max seq (see SQL spec).
 5. Pear: does the engine's single-active-writer rule fully remove the need for Autobase conflict resolution? (see Pear spec — the central design risk).
