@@ -11,7 +11,10 @@ import { isUniqueViolation, type SqlClient } from "./client.js";
 type HeadRow = { seq: number; payload_hash: string };
 type AttestationRow = { attestation: Attestation };
 
-/** The shape `createSqlSubstrate` returns: the seam + the key registry. */
+/** The shape `createSqlSubstrate` returns: the seam + the key registry.
+ *  Structurally mirrors `KeyedSubstrate` in @symblon/substrate-conformance, but is
+ *  defined locally on purpose so this production adapter carries no dependency on the
+ *  test-only conformance package. */
 export type SqlSubstrate = IntegritySubstrate & {
   resolver: PublicKeyResolver;
   registerKey(keyId: string, publicKey: Uint8Array): Promise<void>;
@@ -60,9 +63,21 @@ export function createSqlSubstrate(opts: { sql: SqlClient }): SqlSubstrate {
           ],
         );
       } catch (err) {
+        // Both the (subject, seq) PK and the (subject, payload_hash) unique index raise
+        // SQLSTATE 23505. Map both to HeadConflictError: the PK collision is the intended
+        // optimistic-concurrency race guard (two writers off the same head → exactly one
+        // wins); the payload_hash collision is a defense-in-depth duplicate guard that the
+        // prevHash fast-fail above almost always preempts.
         if (isUniqueViolation(err)) {
-          const now = await readHead(sql, subject);
-          throw new HeadConflictError(subject, attestation.prevHash, now ? now.payload_hash : null);
+          // Best-effort re-read for a precise `actual` — must never mask the conflict.
+          let actual: string | null = null;
+          try {
+            const now = await readHead(sql, subject);
+            actual = now ? now.payload_hash : null;
+          } catch {
+            // ignore: `actual` stays null
+          }
+          throw new HeadConflictError(subject, attestation.prevHash, actual);
         }
         throw err;
       }
