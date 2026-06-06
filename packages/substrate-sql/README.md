@@ -11,6 +11,7 @@ and access control** — **not** for integrity (the chain self-verifies via
 ```ts
 import { Pool } from "pg";
 import { createSqlSubstrate, fromPg, createSchema } from "@symblon/substrate-sql";
+import { verifyChain } from "@symblon/core";
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const sql = fromPg(pool);
