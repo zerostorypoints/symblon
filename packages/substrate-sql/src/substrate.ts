@@ -1,6 +1,7 @@
 // substrate.ts
 import {
   HeadConflictError,
+  verifyAttestation,
   type Attestation,
   type IntegritySubstrate,
   type PublicKeyResolver,
@@ -37,15 +38,19 @@ async function readHead(sql: SqlClient, subject: Subject): Promise<HeadRow | nul
  * same seq; the `(subject, seq)` primary key lets exactly one commit and maps
  * the loser's unique violation to `HeadConflictError`.
  */
-export function createSqlSubstrate(opts: { sql: SqlClient }): SqlSubstrate {
-  const { sql } = opts;
-  return {
+export function createSqlSubstrate(opts: { sql: SqlClient; verifyOnWrite?: boolean }): SqlSubstrate {
+  const { sql, verifyOnWrite = false } = opts;
+  const self: SqlSubstrate = {
     async append(attestation) {
       const subject = attestation.subject;
       const current = await readHead(sql, subject);
       const currentHead = current ? current.payload_hash : null;
       if (attestation.prevHash !== currentHead) {
         throw new HeadConflictError(subject, attestation.prevHash, currentHead);
+      }
+      if (verifyOnWrite) {
+        const v = await verifyAttestation(attestation, self.resolver);
+        if (!v.ok) throw new Error(`verify-on-write rejected attestation: ${v.reason}`);
       }
       const nextSeq = current ? current.seq + 1 : 0;
       try {
@@ -115,4 +120,5 @@ export function createSqlSubstrate(opts: { sql: SqlClient }): SqlSubstrate {
       );
     },
   };
+  return self;
 }
