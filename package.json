@@ -11,6 +11,9 @@
   "homepage": "https://github.com/zerostorypoints/symblon#readme",
   "bugs": "https://github.com/zerostorypoints/symblon/issues",
   "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
