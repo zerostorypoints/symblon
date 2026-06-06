@@ -1,3 +1,4 @@
+// types.ts
 import type { IntegritySubstrate, PublicKeyResolver } from "@symblon/core";
 
 /**
