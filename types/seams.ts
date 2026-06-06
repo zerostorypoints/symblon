@@ -1,6 +1,6 @@
 // types/seams.ts
 import type { Attestation, Subject } from "./attestation.js";
-import type { HeadConflictError } from "../errors.js";
+import type { HeadConflictError } from "../errors.js"; // referenced by the {@link} in append's JSDoc
 
 /** Produces a signature. Implementations climb the custody ladder:
  *  platform KMS -> secure enclave -> owned key. Never exposes the private key. */
