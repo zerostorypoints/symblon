@@ -21,6 +21,18 @@ export { computeMerkleRoot } from "./merkle.js";
 export { commitField, verifyOpening } from "./commitments.js";
 export { currentController, currentCommitments } from "./chain-state.js";
 export {
+  TRANSFORMATION,
+  attestationRef,
+  parseDerivedFrom,
+  parseConsumedIn,
+  type AttestationRef,
+} from "./derivation.js";
+export {
+  verifyDerivation,
+  type DerivationVerification,
+  type DerivationFailureReason,
+} from "./verify-derivation.js";
+export {
   buildPresentation,
   verifyPresentation,
   type DisclosedField,

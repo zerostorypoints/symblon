@@ -42,7 +42,8 @@
     "build": "tsc -p tsconfig.build.json",
     "clean": "rm -rf dist",
     "prepare": "npm run build",
-    "example": "tsx examples/basic-passport.ts"
+    "example": "tsx examples/basic-passport.ts",
+    "example:agro": "tsx examples/agro-batch.ts"
   },
   "keywords": [
     "provenance",
