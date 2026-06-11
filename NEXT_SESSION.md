@@ -1,10 +1,13 @@
 # Next session — state & plan
 
-_Last updated: 2026-06-03_
+_Last updated: 2026-06-11_
 
 ## Where this repo stands
 
-`@symblon/core` **v0.1.1** — the pure provenance engine.
+`@symblon/core` **v0.3.0** — the pure provenance engine.
+
+- **v0.3.0 (2026-06-11): derivation links** — agropass spec #1 shipped. Cross-chain transformation primitive (`derivedFrom`/`consumedIn` reserved claim keys + `attestationRef` + pure `verifyDerivation`), runnable `npm run example:agro`. Design: `docs/superpowers/specs/2026-06-11-agropass-registry-backbone-design.md` (§7), plan: `docs/superpowers/plans/2026-06-11-derivation-links.md`. Tag + push `v0.3.0` pending.
+- **v0.2.0: disclosure primitives** — field commitments + verifiable presentations.
 
 - Complete and tested: **36 tests**, strict TypeScript clean (`npm run build`), runnable example (`npm run example`).
 - Ships a compiled `dist` build (ESM `.js` + `.d.ts`) via `npm run build`; `exports`/`main`/`types` point at `dist/`.
@@ -41,7 +44,8 @@ Other repos consume this engine, so decide and ship the distribution path:
 - Then follow Plan 2: `passport_attestations` table + `device_passports` projection + platform-KMS `Signer` + Supabase `IntegritySubstrate` + Pro-gated mint/transfer.
 
 ### 3. Engine roadmap — deferred surface (build when a consumer needs it)
-- [ ] **`toVerifiableCredential` / `toEpcisEvent`** export adapters — W3C VC / GS1 EPCIS for EU Digital Product Passport compliance (fruit-driven).
+- [x] **Multi-input transformations (derivation links)** — shipped in v0.3.0 (agropass spec #1). Next agro step is spec #2: the agropass registry on the SQL substrate (see the agropass backbone spec §12 for the full sequence).
+- [ ] **`toVerifiableCredential` / `toEpcisEvent`** export adapters — W3C VC / GS1 EPCIS, agro/retail-driven (EPCIS `TransformationEvent` maps 1:1 to derivation links). Note: food is outside the first ESPR/DPP wave — the regulatory anchor is Reg. 178/2002 Art. 18 (see agropass spec §1).
 - [ ] **Public-ledger Merkle anchoring** — `computeMerkleRoot` already exists; add an anchor receipt + a verifier that proves "anchored before time T."
 - [ ] **Hypercore / Autobase `IntegritySubstrate`** — for the sovereign tier (P2P) and the fruit project's multi-writer chains.
 

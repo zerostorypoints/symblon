@@ -8,7 +8,7 @@ Tamper-evidence **without a blockchain**: each record carries the hash of the on
 
 ```bash
 # private git dependency, pinned to a release tag:
-npm install github:zerostorypoints/symblon#v0.2.0
+npm install github:zerostorypoints/symblon#v0.3.0
 # installs as @symblon/core; builds dist on install (prepare);
 # crypto deps (@noble/curves, @noble/hashes, zod) come with it
 ```
@@ -83,6 +83,9 @@ Plus `PublicKeyResolver` `(keyId) => publicKey | null`, injected into verificati
 | `currentController(atts)` / `currentCommitments(atts)` | read a verified chain's current controller key / effective commitment map |
 | `buildPresentation(input, signer, created)` | build + sign a short-lived proof-of-ownership + selective disclosure |
 | `verifyPresentation(p, chain, resolve, now)` | verify a presentation: fresh, chain valid, signer is current controller, openings match commitments |
+| `attestationRef(a)` | the tamper-binding pointer `{ subject, attestationId, payloadHash }` at one attestation |
+| `parseDerivedFrom(claim)` / `parseConsumedIn(claim)` | parse + validate the reserved derivation-link claim keys |
+| `verifyDerivation(output, inputs, resolve)` | verify a transformation: output genesis's `derivedFrom` refs ↔ each input chain's `consumedIn` record, bidirectionally hash-pinned |
 | `canonicalize(value)` / `sha256Hex(s)` | deterministic JSON + hashing primitives |
 | `AttestationSchema` | Zod schema mirroring the `Attestation` type |
 
@@ -92,6 +95,27 @@ Plus `PublicKeyResolver` `(keyId) => publicKey | null`, injected into verificati
 
 Private fields are stored as **salted commitments** on the attestation (`commitments: { field: hash }`) — covered by `payloadHash`, so signed and tamper-evident. The raw `(value, salt)` openings live in custody. An owner builds a short-lived **Presentation** disclosing a chosen subset; any verifier checks it is fresh, that the chain verifies, that the presenter is the chain's *current* controller, and that each opening matches its committed hash — with zero trust in the operator.
 
+### Derivation links — transformations
+
+One subject produced from others (N raw batches → 1 finished batch; a refurbished unit → its donor). The output chain's **genesis claim** carries `derivedFrom: AttestationRef[]` pinning the consumed input states (id + payloadHash); each input chain then appends a reserved **`transformation`** attestation whose claim's `consumedIn` pins the output genesis. Both halves are hash-pinned with no circularity, because the genesis is created first.
+
+```ts
+const genesis = await link(producer, fgBatch, null, {
+  id: "zp-77",
+  type: "transformation",
+  claim: { product: "Borówka 250g", derivedFrom: [attestationRef(a1), attestationRef(b1)] },
+});
+const a2 = await link(producer, rawBatchA, a1, {
+  id: "pz-101-zp77",
+  type: TRANSFORMATION,
+  claim: { consumedIn: attestationRef(genesis) },
+});
+
+await verifyDerivation([genesis], [[a1, a2], [b1, b2]], resolve); // { ok: true }
+```
+
+`verifyDerivation` is pure (all chains passed in) and checks: the output chain verifies; its genesis declares ≥ 1 refs; the input chains match the refs 1:1, verify, contain the pinned states, and record the consumption after them. Failure reasons: `output-chain-invalid`, `missing-derivation`, `input-chain-mismatch`, `input-chain-invalid`, `reference-mismatch`, `consumption-missing` — with `inputSubjectId` naming the offending input. Quantity conservation is deliberately **not** checked — mass balance is registry-layer. A complete fruit-traceability walkthrough (committed prices/suppliers → transformation → tamper detection → auditor disclosure) lives in [`examples/agro-batch.ts`](examples/agro-batch.ts) (`npm run example:agro`); the design is the agropass backbone spec, §7.
+
 ## Scripts
 
 ```bash
@@ -99,6 +123,7 @@ npm test            # vitest — the full engine suite
 npm run typecheck   # tsc --noEmit (strict typecheck)
 npm run build       # emit dist/ — compiled ESM + .d.ts
 npm run example     # run examples/basic-passport.ts
+npm run example:agro # run examples/agro-batch.ts (derivation links)
 ```
 
 > Uses npm. pnpm works too, but pnpm 10/11 blocks dependency build scripts by
@@ -110,7 +135,7 @@ Pure functions only, no I/O, no `Date.now()`/random inside (times and ids are pa
 
 ## Status & deferred
 
-Implemented: the full attestation model, signing/verification, controller-tracking chain verification with custody handover, an anchor-ready Merkle root, and a compiled `dist` build (ESM + `.d.ts`). Deferred by design: W3C Verifiable Credentials / GS1 EPCIS export adapters, public-ledger anchoring, and a Hypercore/Autobase substrate for the sovereign tier.
+Implemented: the full attestation model, signing/verification, controller-tracking chain verification with custody handover, field commitments + verifiable presentations, cross-chain derivation links (`verifyDerivation`), an anchor-ready Merkle root, and a compiled `dist` build (ESM + `.d.ts`). Deferred by design: W3C Verifiable Credentials / GS1 EPCIS export adapters, public-ledger anchoring, and a Hypercore/Autobase substrate for the sovereign tier.
 
 ## License
 
