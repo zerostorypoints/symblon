@@ -7,13 +7,13 @@ Tamper-evidence **without a blockchain**: each record carries the hash of the on
 ## Install
 
 ```bash
-# private git dependency, pinned to a release tag:
+npm install @symblon/core
+# or as a git dependency, pinned to a release tag:
 npm install github:zerostorypoints/symblon#v0.3.0
-# installs as @symblon/core; builds dist on install (prepare);
 # crypto deps (@noble/curves, @noble/hashes, zod) come with it
 ```
 
-> Ships compiled ESM (`dist/*.js`) with type declarations (`dist/*.d.ts`) — consumable by any TypeScript or JavaScript project. Build it with `npm run build`; the published artifact is `dist/`, regenerated automatically on publish via `prepublishOnly`.
+> Ships compiled ESM (`dist/*.js`) with type declarations (`dist/*.d.ts`) — consumable by any TypeScript or JavaScript project. Build it with `npm run build`; the published artifact is `dist/`, regenerated automatically on publish/install via the `prepare` script.
 
 ## Quickstart
 
