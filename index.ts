@@ -29,6 +29,11 @@ export {
   type Reference,
 } from "./reference.js";
 export {
+  verifyReference,
+  type ReferenceVerification,
+  type ReferenceFailureReason,
+} from "./verify-reference.js";
+export {
   TRANSFORMATION,
   parseDerivedFrom,
   parseConsumedIn,
