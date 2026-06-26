@@ -1,0 +1,27 @@
+{
+  "name": "@symblon/substrate-sql",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Postgres/Supabase IntegritySubstrate adapter for @symblon/core (custodial, optimistic head-CAS).",
+  "license": "Apache-2.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "pg": ">=8"
+  },
+  "peerDependenciesMeta": {
+    "pg": { "optional": true }
+  },
+  "devDependencies": {
+    "@symblon/substrate-conformance": "*",
+    "@testcontainers/postgresql": "^10.13.0",
+    "@types/pg": "^8.11.0",
+    "pg": "^8.13.0"
+  }
+}

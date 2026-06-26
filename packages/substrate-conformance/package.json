@@ -1,0 +1,19 @@
+{
+  "name": "@symblon/substrate-conformance",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Shared IntegritySubstrate conformance suite + in-memory reference adapter for @symblon/core.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@noble/curves": "^1.6.0",
+    "@noble/hashes": "^1.5.0"
+  }
+}
