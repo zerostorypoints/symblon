@@ -23,6 +23,12 @@ export { commitField, verifyOpening } from "./commitments.js";
 export { currentController, currentCommitments } from "./chain-state.js";
 export { attestationRef, parseRef, type AttestationRef } from "./attestation-ref.js";
 export {
+  DISPUTES,
+  reference,
+  parseReferences,
+  type Reference,
+} from "./reference.js";
+export {
   TRANSFORMATION,
   parseDerivedFrom,
   parseConsumedIn,
