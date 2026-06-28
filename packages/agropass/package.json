@@ -1,0 +1,22 @@
+{
+  "name": "@symblon/agropass",
+  "version": "0.0.0",
+  "private": true,
+  "description": "agropass domain layer on @symblon/core — lot/party chain subjects + tamper-binding dispute (counter-claim) flow.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@noble/curves": "^1.6.0",
+    "@noble/hashes": "^1.5.0"
+  }
+}
