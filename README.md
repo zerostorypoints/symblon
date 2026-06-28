@@ -86,6 +86,7 @@ Plus `PublicKeyResolver` `(keyId) => publicKey | null`, injected into verificati
 | `attestationRef(a)` | the tamper-binding pointer `{ subject, attestationId, payloadHash }` at one attestation |
 | `parseDerivedFrom(claim)` / `parseConsumedIn(claim)` | parse + validate the reserved derivation-link claim keys |
 | `verifyDerivation(output, inputs, resolve)` | verify a transformation: output genesis's `derivedFrom` refs ↔ each input chain's `consumedIn` record, bidirectionally hash-pinned |
+| `reference(rel, target)` / `parseReferences(claim)` / `verifyReference(referencing, target, resolve)` | a tamper-binding pointer from one chain at a specific attestation on another (e.g. a party chain's `disputes` counter-claim against a contested lot attestation); the engine validates structure + tamper-binding; the `rel` is domain-owned. Demo: `npm run example:dispute` |
 | `canonicalize(value)` / `sha256Hex(s)` | deterministic JSON + hashing primitives |
 | `AttestationSchema` | Zod schema mirroring the `Attestation` type |
 
@@ -124,6 +125,7 @@ npm run typecheck   # tsc --noEmit (strict typecheck)
 npm run build       # emit dist/ — compiled ESM + .d.ts
 npm run example     # run examples/basic-passport.ts
 npm run example:agro # run examples/agro-batch.ts (derivation links)
+npm run example:dispute # run examples/dispute.ts (cross-chain references)
 ```
 
 > Uses npm. pnpm works too, but pnpm 10/11 blocks dependency build scripts by

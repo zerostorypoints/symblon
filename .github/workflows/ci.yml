@@ -19,6 +19,8 @@ jobs:
       - run: npm test
       - run: npm run typecheck -w @symblon/substrate-conformance
       - run: npm test -w @symblon/substrate-conformance
+      - run: npm run typecheck -w @symblon/agropass
+      - run: npm test -w @symblon/agropass
       - run: npm run typecheck -w @symblon/substrate-sql
       - run: npm run build
 
