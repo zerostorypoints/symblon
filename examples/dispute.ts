@@ -52,8 +52,8 @@ const growerKey = key("grower-7");
 const resolver: PublicKeyResolver = async (id) =>
   id === lotKey.keyId ? lotKey.pub : id === growerKey.keyId ? growerKey.pub : null;
 
-const lot: Subject = { scheme: "agropass.lot", id: "BB-123" };
-const party: Subject = { scheme: "agropass.party", id: "grower-7" };
+const lot: Subject = { scheme: "agriculture.lot", id: "BB-123" };
+const party: Subject = { scheme: "agriculture.party", id: "grower-7" };
 
 const g1 = await link(lotKey, lot, null, { id: "g1", type: "harvest", claim: { species: "blueberry" } });
 const rejection = await link(lotKey, lot, g1, {

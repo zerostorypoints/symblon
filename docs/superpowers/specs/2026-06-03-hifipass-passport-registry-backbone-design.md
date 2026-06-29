@@ -30,12 +30,12 @@ This design **consciously evolves** the existing hifisync account/actor model (i
 |---|---|---|
 | **Core engine** (`@symblon/core`, this repo) | Domain-neutral provenance primitives | chains, signing, verification, custody handover, commitments, presentations, recovery semantics |
 | **hifipass — the registry** | The *hi-fi* passport: registry backend + public API + MCP, built on the engine | the public projection + commitments, the VIN-like lookup service, anchoring |
-| **agropass — a sibling registry** | A *fruit / agriculture* passport on the same engine | its own registry + domain schema (out of scope here; named so the backbone stays reusable) |
+| **agriculture — a sibling registry** | A *fruit / agriculture* passport on the same engine | its own registry + domain schema (out of scope here; named so the backbone stays reusable) |
 | **hifisync — the app + custodian** | The hi-fi consumer app, tightly integrated with hifipass | owner accounts, key custody + signing, **private field values**, the key↔person map, recovery custodianship, all owner UX |
 
 Load-bearing rules that fall out:
 
-- **The reuse lives in the core, not in hifipass.** hifipass is hi-fi-specific; agropass is the parallel proof that the engine is the general-purpose part. Every backbone decision is tested against *"core primitive, or domain concern?"* and pushed as low as it can go, so agropass inherits it.
+- **The reuse lives in the core, not in hifipass.** hifipass is hi-fi-specific; the agriculture registry is the parallel proof that the engine is the general-purpose part. Every backbone decision is tested against *"core primitive, or domain concern?"* and pushed as low as it can go, so the agriculture registry inherits it.
 - **hifipass is a neutral, multi-writer registry**, not "hifisync's backend exposed." Manufacturers / distributors / retailers are B2B actors who will never be hifisync consumer-app users; they integrate hifipass directly via its API/MCP. hifisync is the first privileged client, not the only one.
 - **The registry never holds private values or keys.** See §3 — this is forced by the substrate ambition, not a preference.
 
@@ -142,7 +142,7 @@ The engine only lets the **current controller** sign a `custody_change`. Recover
 
 ## 11. Engine extensions required (`@symblon/core`)
 
-The backbone needs four additions to the pure engine, each domain-neutral so agropass inherits them:
+The backbone needs four additions to the pure engine, each domain-neutral so the agriculture registry inherits them:
 
 1. **Two-party transfer** — a propose→accept pair where custody moves only when *both* the outgoing controller and the incoming key have signed. (Today `custody_change` is one-sided.)
 2. **Recovery-authorized `custody_change`** — a controller rotation authorized by a passport's **recovery policy** (guardian set + threshold) instead of the current controller. Verification must understand the recovery policy and the guardian signatures.
@@ -178,7 +178,7 @@ The whole backbone is **operator-trusted now, verifiable-ready always.** In the 
 ## 14. Scope / deferred
 
 - **Marketplace** — listings / for-sale / discovery on passports (hifisync §7/§11; "Guardrail 7" change). Out.
-- **agropass** — the sibling fruit registry; named here only to keep the backbone reusable. Its own spec cycle.
+- **agriculture** — the sibling fruit registry; named here only to keep the backbone reusable. Its own spec cycle.
 - **P2P / blockchain substrate** — only ever as a Merkle-root **notary**; the lookup stays an operator service.
 - **Multi-guardian / MPC recovery** — sovereign / Ultra-tier upgrade (§10).
 - **On-chain multisig escrow** — v1 uses app-layer manufacturer co-approval (§7).
@@ -201,5 +201,5 @@ The whole backbone is **operator-trusted now, verifiable-ready always.** In the 
 - **High-value threshold** — the manufacturer-co-approval-on-release rule (§7) needs a "high-value" definition and a fallback when the manufacturer is not integrated.
 - **Time-lock UX** — a 7-day recovery notice window is safe but slow; define the channel that notifies a resurfaced key and the cancel path (§10).
 - **Engine purity** — recovery policy + two-party transfer add state the verifier must track; confirm they stay expressible without breaking the engine's no-I/O, pure-function discipline (policies passed in, like keys are today).
-- **agropass divergence** — confirm the four engine extensions are genuinely domain-neutral before agropass relies on them (e.g. multi-writer fruit chains may want N-party, not two-party, handover).
+- **agriculture divergence** — confirm the four engine extensions are genuinely domain-neutral before the agriculture registry relies on them (e.g. multi-writer fruit chains may want N-party, not two-party, handover).
 - **GDPR** — receipt/photo evidence (§8) and the key↔person map (§4) are PII in custody; deletion-on-account-delete must not break chain verifiability (commitments stay; openings are destroyed).

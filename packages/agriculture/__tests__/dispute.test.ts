@@ -12,12 +12,12 @@ import {
 const HASH = "a".repeat(64);
 const contested = {
   id: "w2",
-  subject: { scheme: "agropass.lot", id: "BB-123" },
+  subject: { scheme: "agriculture.lot", id: "BB-123" },
   payloadHash: HASH,
 } as unknown as Attestation;
 
 describe("COUNTER_CLAIM", () => {
-  it("is the agropass counter-claim event type", () => {
+  it("is the agriculture domain counter-claim event type", () => {
     expect(COUNTER_CLAIM).toBe("counter_claim");
   });
 });

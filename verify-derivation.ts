@@ -29,7 +29,7 @@ function subjectKey(s: { scheme: string; id: string }): string {
  *
  * Pure: all chains are passed in (the registry serves the cone; this checks
  * it). One ref per input subject in v1. Quantity conservation is NOT checked
- * here — mass balance is registry-layer analytics (agropass spec §7).
+ * here — mass balance is registry-layer analytics (agriculture backbone spec §7).
  */
 export async function verifyDerivation(
   output: Attestation[],

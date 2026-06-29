@@ -1,6 +1,6 @@
 // verify-dispute.test.ts
 //
-// End-to-end agropass dispute scenario (the runnable narrative):
+// End-to-end agricultural-traceability dispute scenario (the runnable narrative):
 // a grower harvests a lot of blueberries and hands custody to a wholesaler
 // (real custody_change baton-pass); the wholesaler — now sole controller —
 // records a quality rejection on the lot chain. The grower, no longer able to

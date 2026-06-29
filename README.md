@@ -115,7 +115,7 @@ const a2 = await link(producer, rawBatchA, a1, {
 await verifyDerivation([genesis], [[a1, a2], [b1, b2]], resolve); // { ok: true }
 ```
 
-`verifyDerivation` is pure (all chains passed in) and checks: the output chain verifies; its genesis declares ≥ 1 refs; the input chains match the refs 1:1, verify, contain the pinned states, and record the consumption after them. Failure reasons: `output-chain-invalid`, `missing-derivation`, `input-chain-mismatch`, `input-chain-invalid`, `reference-mismatch`, `consumption-missing` — with `inputSubjectId` naming the offending input. Quantity conservation is deliberately **not** checked — mass balance is registry-layer. A complete fruit-traceability walkthrough (committed prices/suppliers → transformation → tamper detection → auditor disclosure) lives in [`examples/agro-batch.ts`](examples/agro-batch.ts) (`npm run example:agro`); the design is the agropass backbone spec, §7.
+`verifyDerivation` is pure (all chains passed in) and checks: the output chain verifies; its genesis declares ≥ 1 refs; the input chains match the refs 1:1, verify, contain the pinned states, and record the consumption after them. Failure reasons: `output-chain-invalid`, `missing-derivation`, `input-chain-mismatch`, `input-chain-invalid`, `reference-mismatch`, `consumption-missing` — with `inputSubjectId` naming the offending input. Quantity conservation is deliberately **not** checked — mass balance is registry-layer. A complete fruit-traceability walkthrough (committed prices/suppliers → transformation → tamper detection → auditor disclosure) lives in [`examples/agro-batch.ts`](examples/agro-batch.ts) (`npm run example:agro`); the design is the agriculture backbone spec, §7.
 
 ## Scripts
 

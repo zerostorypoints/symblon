@@ -2,11 +2,11 @@
 
 > Self-contained prompt for a session in `/Users/piotrdziubecki/Projects/symblon-web`.
 > Written 2026-06-12 in the symblon engine repo, after `@symblon/core` v0.3.0 (derivation links) shipped.
-> Supersedes `2026-06-11-symblon-web-agropass-showcase.md`.
+> Supersedes `2026-06-11-symblon-web-agriculture-showcase.md`.
 
 ---
 
-Add the **fruit / agriculture use case** to symblon.com — the second proof that the engine is domain-neutral. Two deliverables: (A) a zero-JS **marketing section** telling the agropass story, and (B) an **interactive agropass demo scenario** running the real `@symblon/core` engine client-side, alongside the existing hi-fi demo. The headline of both: **same engine, different domain** — hi-fi is units + custody; agriculture is batches + transformations.
+Add the **fruit / agriculture use case** to symblon.com — the second proof that the engine is domain-neutral. Two deliverables: (A) a zero-JS **marketing section** telling the agricultural-traceability story, and (B) an **interactive agriculture demo scenario** running the real `@symblon/core` engine client-side, alongside the existing hi-fi demo. The headline of both: **same engine, different domain** — hi-fi is units + custody; agriculture is batches + transformations.
 
 ## Prerequisite — check before any work
 
@@ -19,11 +19,11 @@ The demo needs `@symblon/core` **v0.3.0** (it introduced derivation links). Chec
 ## Context you need
 
 - **This repo (symblon-web)** is the Astro marketing + live-demo site for the symblon provenance engine. Current demo: a seven-step hi-fi passport scenario in `src/demo/scenario.ts` (framework-agnostic, unit-tested, deterministic — locked timestamp constants, no `Date.now()`), rendered by the lazy-hydrated Svelte island `src/islands/Demo.svelte`, with zero-JS marketing sections in `src/components/`. Design system: "Schematic Terminal" (`src/styles/global.css` — steel ground + grid; cyan = structure, green = verified). Read `docs/superpowers/specs/2026-06-04-symblon-web-design.md` first and mirror its conventions and copy voice.
-- **The design source** is the agropass backbone spec in the engine repo (public): `docs/superpowers/specs/2026-06-11-agropass-registry-backbone-design.md` at `github.com/zerostorypoints/symblon` (locally: `/Users/piotrdziubecki/Projects/symblon`). The canonical engine-usage walkthrough is `examples/agro-batch.ts` there — copy its scenario shape, not its code style; this repo has its own harness (`src/demo/harness.ts`).
+- **The design source** is the agriculture backbone spec in the engine repo (public): `docs/superpowers/specs/2026-06-11-agriculture-registry-backbone-design.md` at `github.com/zerostorypoints/symblon` (locally: `/Users/piotrdziubecki/Projects/symblon`). The canonical engine-usage walkthrough is `examples/agro-batch.ts` there — copy its scenario shape, not its code style; this repo has its own harness (`src/demo/harness.ts`).
 
-## The agropass model in brief (from the spec — the content both deliverables dramatize)
+## The agriculture model in brief (from the spec — the content both deliverables dramatize)
 
-- **agropass is a trust layer under a fruit producer's ERP, not an ERP.** The ERP keeps stock, prices, planning; agropass receives five traceability moments — delivery receipt, quality inspection, transformation (production), dispatch, correction — and gives back lineage that buyers, auditors, and consumers can verify **without trusting the producer's database**. Anchored on a real Polish soft-fruit producer's requirements (blueberry / raspberry / strawberry).
+- **The agriculture registry is a trust layer under a fruit producer's ERP, not an ERP.** The ERP keeps stock, prices, planning; the agriculture registry receives five traceability moments — delivery receipt, quality inspection, transformation (production), dispatch, correction — and gives back lineage that buyers, auditors, and consumers can verify **without trusting the producer's database**. Anchored on a real Polish soft-fruit producer's requirements (blueberry / raspberry / strawberry).
 - **Subjects are batches** (raw, finished, waste), keeping the producer's existing semantic batch codes.
 - **Two data tiers:** public (species, variety, origin country, quality class, dates, lineage *shape*) vs **committed** salted-hash commitments (prices, supplier identity, weights) — B2B confidentiality is the producer's #1 sensitivity; a buyer who learns which farm supplied a batch can cut the producer out.
 - **Derivation links (v0.3.0, the new primitive):** the finished batch's genesis claim carries `derivedFrom: [attestationRef(...)]` pinning the consumed input states; each input chain then appends a reserved `TRANSFORMATION` attestation whose `consumedIn` pins that genesis. `verifyDerivation(output, inputs, resolver)` checks both halves bidirectionally; failures name the offending input via `inputSubjectId`. New exports: `TRANSFORMATION`, `attestationRef`, `parseDerivedFrom`, `parseConsumedIn`, `verifyDerivation`.
