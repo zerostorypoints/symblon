@@ -8,7 +8,7 @@ import { attestationRef, parseRef, type AttestationRef } from "./attestation-ref
 export type Reference = { rel: string; ref: AttestationRef };
 
 /** Reserved relationship: a counter-claim contesting the referenced attestation.
- *  The canonical agropass dispute (a party chain → a contested lot attestation). */
+ *  The canonical agricultural-traceability dispute (a party chain → a contested lot attestation). */
 export const DISPUTES = "disputes" as const;
 
 /** Build a reference of relationship `rel` pinning `target`. */

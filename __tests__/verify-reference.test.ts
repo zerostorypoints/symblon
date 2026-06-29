@@ -18,7 +18,7 @@ async function link(
   const input: AttestationInput = {
     ...partial,
     subject,
-    issuer: { scheme: "agropass.party", id: "actor", keyId: key.keyId },
+    issuer: { scheme: "agriculture.party", id: "actor", keyId: key.keyId },
     occurredAt: T,
     recordedAt: T,
     prevHash: prev ? prev.payloadHash : null,
@@ -26,8 +26,8 @@ async function link(
   return signAttestation(buildAttestation(input), signerFor(key), T);
 }
 
-const lot: Subject = { scheme: "agropass.lot", id: "BB-123" };
-const growerChain: Subject = { scheme: "agropass.party", id: "grower-7" };
+const lot: Subject = { scheme: "agriculture.lot", id: "BB-123" };
+const growerChain: Subject = { scheme: "agriculture.party", id: "grower-7" };
 
 /** Lot chain: grower harvest → custody passes → wholesaler records a rejection.
  *  (Custody mechanics are exercised elsewhere; here both lot links are signed by

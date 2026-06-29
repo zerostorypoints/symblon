@@ -2,7 +2,7 @@
 
 Guidance for Claude Code and other AI assistants working in the `symblon` repo.
 
-`@symblon/core` is a **pure provenance engine** — signed, hash-linked, append-only attestation chains. No UI, no framework, no I/O. The repo is an npm-workspaces monorepo: the core engine at the root, storage substrates under `packages/`. It serves two product registries built on top of it — **hifipass** (consumer hi-fi) and **agropass** (agriculture / fruit traceability). Specs live in `docs/superpowers/specs/`, implementation plans in `docs/superpowers/plans/`.
+`@symblon/core` is a **pure provenance engine** — signed, hash-linked, append-only attestation chains. No UI, no framework, no I/O. The repo is an npm-workspaces monorepo: the core engine at the root, storage substrates under `packages/`. It serves two product registries built on top of it — **hifipass** (consumer hi-fi) and an **agricultural traceability** registry (fruit / produce track-and-trace). Specs live in `docs/superpowers/specs/`, implementation plans in `docs/superpowers/plans/`.
 
 These rules apply to every task in this project unless explicitly overridden.
 Bias: caution over speed on non-trivial work. Use judgment on trivial tasks.

@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Add a typed, tamper-binding cross-chain reference primitive to `@symblon/core` so an attestation on one chain can point at a specific attestation on another chain — the foundation for agropass disputes/counter-claims (a party chain referencing a contested lot attestation).
+**Goal:** Add a typed, tamper-binding cross-chain reference primitive to `@symblon/core` so an attestation on one chain can point at a specific attestation on another chain — the foundation for agricultural-traceability disputes/counter-claims (a party chain referencing a contested lot attestation).
 
 **Architecture:** Extract the existing `AttestationRef` value object (currently private to `derivation.ts`) into its own module, then build a general `references` claim mechanism alongside the transformation-specific `derivedFrom`/`consumedIn` (which stay untouched). A `references` claim carries `[{ rel, ref }]` entries; `rel` is a domain-owned relationship string (e.g. `"disputes"`), `ref` is a tamper-binding `AttestationRef`. A `verifyReference` checker confirms — across two passed-in chains — that the link is real and hash-exact, exactly mirroring the existing `verifyDerivation`. The engine validates structure + tamper-binding only; the *meaning* of `rel` stays in the domain (the `custody_change`/`derivedFrom` precedent: engine special-cases the reserved key, domain owns semantics).
 
@@ -279,7 +279,7 @@ import { attestationRef, parseRef, type AttestationRef } from "./attestation-ref
 export type Reference = { rel: string; ref: AttestationRef };
 
 /** Reserved relationship: a counter-claim contesting the referenced attestation.
- *  The canonical agropass dispute (a party chain → a contested lot attestation). */
+ *  The canonical agricultural-traceability dispute (a party chain → a contested lot attestation). */
 export const DISPUTES = "disputes" as const;
 
 /** Build a reference of relationship `rel` pinning `target`. */
@@ -381,7 +381,7 @@ async function link(
   const input: AttestationInput = {
     ...partial,
     subject,
-    issuer: { scheme: "agropass.party", id: "actor", keyId: key.keyId },
+    issuer: { scheme: "agriculture.party", id: "actor", keyId: key.keyId },
     occurredAt: T,
     recordedAt: T,
     prevHash: prev ? prev.payloadHash : null,
@@ -389,8 +389,8 @@ async function link(
   return signAttestation(buildAttestation(input), signerFor(key), T);
 }
 
-const lot: Subject = { scheme: "agropass.lot", id: "BB-123" };
-const growerChain: Subject = { scheme: "agropass.party", id: "grower-7" };
+const lot: Subject = { scheme: "agriculture.lot", id: "BB-123" };
+const growerChain: Subject = { scheme: "agriculture.party", id: "grower-7" };
 
 /** Lot chain: grower harvest → custody passes → wholesaler records a rejection.
  *  (Custody mechanics are exercised elsewhere; here both lot links are signed by
@@ -662,8 +662,8 @@ const growerKey = key("grower-7");
 const resolver: PublicKeyResolver = async (id) =>
   id === lotKey.keyId ? lotKey.pub : id === growerKey.keyId ? growerKey.pub : null;
 
-const lot: Subject = { scheme: "agropass.lot", id: "BB-123" };
-const party: Subject = { scheme: "agropass.party", id: "grower-7" };
+const lot: Subject = { scheme: "agriculture.lot", id: "BB-123" };
+const party: Subject = { scheme: "agriculture.party", id: "grower-7" };
 
 const g1 = await link(lotKey, lot, null, { id: "g1", type: "harvest", claim: { species: "blueberry" } });
 const rejection = await link(lotKey, lot, g1, {
@@ -726,7 +726,7 @@ git commit -m "docs(core): runnable dispute example + cross-chain references REA
 Per spec §10–§11 and the §12 open questions, these are **separate plans** (each needs its own design resolution first):
 
 - **Identity + erasure module (crypto-shred)** — spec §6.4. Open: package location (`packages/identity`?), exact API for the `keyId → party` registry and the shred operation, and how the "personal data only via `commitField`" guardrail is enforced. Resolve §12 questions, then plan.
-- **agropass view / reverse-reference index** — spec §3.4. Open: the registry-layer reverse-index schema (an indexed `references` table keyed by target `(subject, attestationId)`) and its placement relative to `substrate-sql`. Registry-layer, Postgres-coupled.
+- **agriculture view / reverse-reference index** — spec §3.4. Open: the registry-layer reverse-index schema (an indexed `references` table keyed by target `(subject, attestationId)`) and its placement relative to `substrate-sql`. Registry-layer, Postgres-coupled.
 
 This plan delivers the core primitive both of the above build on.
 

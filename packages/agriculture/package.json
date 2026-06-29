@@ -1,8 +1,8 @@
 {
-  "name": "@symblon/agropass",
+  "name": "@symblon/agriculture",
   "version": "0.0.0",
   "private": true,
-  "description": "agropass domain layer on @symblon/core — lot/party chain subjects + tamper-binding dispute (counter-claim) flow.",
+  "description": "Agriculture domain layer on @symblon/core — lot/party chain subjects + tamper-binding dispute (counter-claim) flow.",
   "license": "Apache-2.0",
   "type": "module",
   "exports": {

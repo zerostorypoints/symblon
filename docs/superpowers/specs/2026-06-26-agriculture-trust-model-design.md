@@ -1,12 +1,12 @@
-# agropass trust model — multi-actor mutability, erasure & backend evolution
+# Agriculture trust model — multi-actor mutability, erasure & backend evolution
 
-**Status:** Design (decision doc). Defines how agropass answers the trust questions agrocontracts raised on a discovery call: what is immutable vs. alterable, who can remove data, multisig, how mutually-distrusting actors trust the platform, and what the storage backend choice (Postgres / P2P / blockchain) implies. Sibling of the agropass backbone (`2026-06-11-agropass-registry-backbone-design.md`), which it extends with the multi-actor dispute model and a GDPR-compliant erasure mechanism.
+**Status:** Design (decision doc). Defines how the agriculture registry answers the trust questions agrocontracts raised on a discovery call: what is immutable vs. alterable, who can remove data, multisig, how mutually-distrusting actors trust the platform, and what the storage backend choice (Postgres / P2P / blockchain) implies. Sibling of the agriculture backbone (`2026-06-11-agriculture-registry-backbone-design.md`), which it extends with the multi-actor dispute model and a GDPR-compliant erasure mechanism.
 **Date:** 2026-06-26
 **Author:** Claude + Piotr (brainstorm session)
 **Spec type:** Trust / mutability / erasure / backend evolution
 **Anchor case:** agrocontracts (https://www.agrocontracts.com/) — an ERP + WMS + track-and-trace product for soft-fruit growers. They ship packaged crops (e.g. blueberries) to wholesalers and retailers; returns and quality disputes today are reported informally (WhatsApp photos, paper). They want those records tamper-proof, want every actor able to dispute, and have a hard requirement to offboard / erase any party (GDPR). Their actors are **not tech-savvy and cannot run infrastructure** — the cryptography must be invisible.
 
-> **Relationship to the backbone spec.** The 2026-06-11 backbone defines agropass's identity, disclosure, and registry layers against the Szulc workbook. This spec drills into the *multi-party trust dynamics* that the agrocontracts call surfaced: disputes between distrusting actors, the right to erasure, and the consequences of the storage substrate. Where the two overlap (commitments, custody, derivation links), this spec defers to the backbone and only adds the dispute + erasure deltas.
+> **Relationship to the backbone spec.** The 2026-06-11 backbone defines the agriculture registry's identity, disclosure, and registry layers against the Szulc workbook. This spec drills into the *multi-party trust dynamics* that the agrocontracts call surfaced: disputes between distrusting actors, the right to erasure, and the consequences of the storage substrate. Where the two overlap (commitments, custody, derivation links), this spec defers to the backbone and only adds the dispute + erasure deltas.
 
 ---
 
@@ -41,13 +41,13 @@ Model B maps almost entirely onto primitives symblon already has (single-control
 
 Everything is a `Subject` + `Attestation` chain on the existing `IntegritySubstrate`. There is no new chain type in the engine; the two roles below are conventions on `Subject.scheme`.
 
-### 3.1 Lot chains (`agropass.lot`) — the goods, custody baton-passed
+### 3.1 Lot chains (`agriculture.lot`) — the goods, custody baton-passed
 
 The canonical track-and-trace timeline for a physical lot. Custody passes grower → wholesaler → retailer via the existing `custody_change` event; the current controller is the **sole writer**. This is symblon's existing model verbatim — **zero new engine code.** Receiving, storage, and even a rejection-on-receipt are appended by whoever currently holds custody.
 
 Splits (one grower lot → three wholesalers) and aggregations (many lots → one pallet) are modeled by the **existing derivation links** (`derivedFrom` / `consumedIn`), as already specified in the backbone §7.
 
-### 3.2 Party chains (`agropass.party`) — each actor's sovereign ledger
+### 3.2 Party chains (`agriculture.party`) — each actor's sovereign ledger
 
 When an actor needs to make a statement they are *not entitled* to write on a lot chain — the canonical case being the grower **disputing** a wholesaler's rejection after custody has already moved away from them — that statement goes on the actor's **own** party chain. It is a signed attestation carrying a tamper-binding reference to the exact contested lot attestation.
 
@@ -63,10 +63,10 @@ Key consequences:
 flowchart TB
   subgraph immutable["IMMUTABLE LAYER — signed, hash-linked, (later) anchored"]
     direction TB
-    subgraph lot["Lot chain  (agropass.lot:BB-123)  — custody baton-passed"]
+    subgraph lot["Lot chain  (agriculture.lot:BB-123)  — custody baton-passed"]
       g1["harvest<br/>(grower)"] --> g2["packaged<br/>(grower)"] --> hc["custody_change →<br/>wholesaler"] --> w1["received<br/>(wholesaler)"] --> w2["REJECTED grade C, mold<br/>commit:photo<br/>(wholesaler)"]
     end
-    subgraph party["Party chain  (agropass.party:grower-7)  — grower's sovereign ledger"]
+    subgraph party["Party chain  (agriculture.party:grower-7)  — grower's sovereign ledger"]
       d1["counter-claim:<br/>'dispute mold finding'"]
     end
     d1 -. "references (tamper-binding<br/>AttestationRef → pins payloadHash)" .-> w2
@@ -84,7 +84,7 @@ flowchart TB
 
 The dispute (`grower-7` → `disputes` → the rejection) lives on the grower's own chain and only *points at* the rejection. The lot chain is never edited. The photo and the signer's real identity live in the erasable store; the chain holds only their digests.
 
-### 3.4 The agropass view — assembling the picture
+### 3.4 The agriculture view — assembling the picture
 
 A reader (buyer, auditor, the dispute UI) sees a lot's full story by reading the lot chain and surfacing every party-chain attestation that *references* it. The forward references are tamper-binding (in the chain); the **reverse index** ("what references attestation X?") is a query-layer concern, maintained in Postgres by the registry. The reverse index is a performance convenience, not a trust anchor — it can be rebuilt by scanning chains, and a missing entry cannot forge or hide a properly-signed reference held by the disputing party.
 
@@ -103,7 +103,7 @@ symblon currently has a transformation-specific reference: `derivedFrom` / `cons
 Generalize it:
 
 - Reuse `AttestationRef` and the internal `parseRef` (already tamper-binding: the `payloadHash` pins the target's exact content, so a reference cannot be silently re-pointed at a different version of the target).
-- Add a reserved relationship key — `references` (with a relationship discriminator, e.g. `{ rel: "disputes", ref: AttestationRef }`) — parsed and validated by the engine the way `custody_change` and `derivedFrom` already are. The engine validates the ref is well-formed and tamper-binding; the *meaning* of `rel` stays in the agropass domain (custody_change precedent: engine special-cases the reserved key, domain owns the semantics).
+- Add a reserved relationship key — `references` (with a relationship discriminator, e.g. `{ rel: "disputes", ref: AttestationRef }`) — parsed and validated by the engine the way `custody_change` and `derivedFrom` already are. The engine validates the ref is well-formed and tamper-binding; the *meaning* of `rel` stays in the agriculture domain (custody_change precedent: engine special-cases the reserved key, domain owns the semantics).
 - Keep `derivedFrom` / `consumedIn` working unchanged (they become a documented special case of the general mechanism, or remain alongside it — an implementation choice for the plan).
 
 No change to `verifyChain`, head-CAS, signing, or the substrate seam. Roughly a day of core work plus tests.
@@ -125,11 +125,11 @@ This is also why **public anchoring stays compatible with erasure**: only commit
 - **Supported (v1): erase the person.** Crypto-shred their personal data; unlink their identity so their key is an orphan pseudonym. The chain still verifies. The party is, for all practical and legal purposes, erased.
 - **Not promised: expunge their signed records from history.** This would break every downstream chain that references them *and* likely violate the law agrocontracts operates under — **EU food-traceability (Reg. 178/2002 Art. 18)** mandates one-step-back / one-step-forward records, and **GDPR Art. 17(3) explicitly exempts data required for legal compliance.** Literal expunging is both self-defeating cryptographically and probably prohibited regulatorily.
 
-The realistic, compliant shape is **selective erasure**: shred contact / identity data, retain the minimal legally-required transaction link, now pointing at an anonymized pseudonym. agropass is not working around GDPR — it implements GDPR correctly, including its retention carve-outs.
+The realistic, compliant shape is **selective erasure**: shred contact / identity data, retain the minimal legally-required transaction link, now pointing at an anonymized pseudonym. The agriculture registry is not working around GDPR — it implements GDPR correctly, including its retention carve-outs.
 
 ### 6.3 The hard architectural rule this imposes
 
-**Personal data may only enter a chain as a commitment (`commitField`) — never as a plaintext `claim` field, never anything that gets anchored.** A name dropped into a plaintext claim becomes un-erasable. The identity/erasure module and the agropass schema layer must make "personal data goes through `commitField`" the path of least resistance (schema-enforced where possible; reviewed otherwise).
+**Personal data may only enter a chain as a commitment (`commitField`) — never as a plaintext `claim` field, never anything that gets anchored.** A name dropped into a plaintext claim becomes un-erasable. The identity/erasure module and the agriculture schema layer must make "personal data goes through `commitField`" the path of least resistance (schema-enforced where possible; reviewed otherwise).
 
 ### 6.4 New module: identity + erasure (not core)
 
@@ -146,7 +146,7 @@ A small package outside `@symblon/core`:
 
 ## 8. Backend evolution — Postgres now, P2P / blockchain later, no rewrite
 
-The storage substrate is already abstracted behind one seam (`IntegritySubstrate`) with a shared conformance suite (`@symblon/substrate-conformance`, merged 2026-06-26). This is what makes the evolution safe: a new backend is a new implementation behind the same seam, validated to behave *identically*, and **the agropass domain code does not change across any of them.**
+The storage substrate is already abstracted behind one seam (`IntegritySubstrate`) with a shared conformance suite (`@symblon/substrate-conformance`, merged 2026-06-26). This is what makes the evolution safe: a new backend is a new implementation behind the same seam, validated to behave *identically*, and **the agriculture domain code does not change across any of them.**
 
 | Stage | Substrate | Trust property gained | Cost to actors |
 |---|---|---|---|
@@ -168,7 +168,7 @@ The storage substrate is already abstracted behind one seam (`IntegritySubstrate
 
 ## 10. v1 scope boundary
 
-**In:** lot chains (existing) + party chains (convention) + the generalized cross-chain reference primitive (§5, the one core delta) + the identity/erasure module (§6.4) + the Postgres substrate (merged) + the agropass view / reverse index (registry layer).
+**In:** lot chains (existing) + party chains (convention) + the generalized cross-chain reference primitive (§5, the one core delta) + the identity/erasure module (§6.4) + the Postgres substrate (merged) + the agriculture view / reverse index (registry layer).
 
 **Out (deferred, forward-compatible):** anchoring, P2P substrate, co-signed handoffs, governance quorum, arbiter rulings, dispute workflow states, SLAs.
 
@@ -183,7 +183,7 @@ The storage substrate is already abstracted behind one seam (`IntegritySubstrate
 | Substrate conformance suite (safe backend evolution) | ✅ `@symblon/substrate-conformance` (merged 2026-06-26) |
 | **Generalized cross-chain reference (disputes)** | ⬜ core delta (§5) |
 | **Identity + erasure module (crypto-shred)** | ⬜ new package (§6.4) |
-| **agropass view / reverse-reference index** | ⬜ registry layer |
+| **agriculture view / reverse-reference index** | ⬜ registry layer |
 | Anchoring, P2P, co-signed handoffs, governance | ⬜ deferred (§7, §8) |
 
 ## 12. Open questions for the next pass

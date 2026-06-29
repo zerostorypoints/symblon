@@ -19,10 +19,10 @@ export type DisputeVerification =
   | { ok: false; reason: DisputeFailureReason };
 
 /**
- * Verify an agropass dispute: a party chain (`agropass.party`) carrying a
- * `disputes` counter-claim that tamper-bindingly pins an attestation on a lot
- * chain (`agropass.lot`). Wraps the engine's `verifyReference` and adds the
- * agropass semantics the engine deliberately omits — the scheme roles and the
+ * Verify an agricultural-traceability dispute: a party chain (`agriculture.party`)
+ * carrying a `disputes` counter-claim that tamper-bindingly pins an attestation on a lot
+ * chain (`agriculture.lot`). Wraps the engine's `verifyReference` and adds the
+ * agriculture domain semantics the engine deliberately omits — the scheme roles and the
  * `disputes` relationship (the engine carries `rel` but never interprets it).
  *
  * Pure: both chains are passed in (the registry serves them; this checks them).

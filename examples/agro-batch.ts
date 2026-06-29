@@ -3,7 +3,7 @@
  *
  * Run it:  npm run example:agro   (or: npx tsx examples/agro-batch.ts)
  *
- * The agropass shape (spec §7): two raw fruit batches are delivered
+ * The agricultural-traceability shape (spec §7): two raw fruit batches are delivered
  * (suppliers + prices COMMITTED, never cleartext), then consumed to produce
  * one finished-good batch via derivation links. `verifyDerivation` proves the
  * lineage; tampering with any input delivery breaks it. A Presentation then

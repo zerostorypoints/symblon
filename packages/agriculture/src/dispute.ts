@@ -9,7 +9,7 @@ import {
   type Reference,
 } from "@symblon/core";
 
-/** agropass event type for a counter-claim attestation recorded on a party
+/** Agriculture domain event type for a counter-claim attestation recorded on a party
  *  chain (the disputing actor's sovereign ledger). */
 export const COUNTER_CLAIM = "counter_claim" as const;
 
